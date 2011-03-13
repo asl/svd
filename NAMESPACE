@@ -1,0 +1,12 @@
+useDynLib(svd)
+
+export(
+       # External matrix stuff
+       is.extmat,
+       extmat.ncol,
+       extmat.nrow,
+       # Propack SVD
+       propack.svd,
+       # nuTRLan SVD and eigensolver
+       trlan.svd,
+       trlan.eigen)
