@@ -1,8 +1,8 @@
 Package: svd
 Type: Package
 Title: Interfaces to various state-of-art SVD and eigensolvers
-Version: 0.1
-Date: 2011-03-13
+Version: 0.2
+Date: 2011-05-26
 Author: Anton Korobeynikov
 Maintainer: Anton Korobeynikov <asl@math.spbu.ru>
 Description: This package provides various R bindings to various SVD and eigensolvers (PROPACK, nuTRLan)
