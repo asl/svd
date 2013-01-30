@@ -1,20 +1,20 @@
 #   R package for Singular Spectrum Analysis
 #   Copyright (c) 2009 Anton Korobeynikov <asl@math.spbu.ru>
-#   
-#   This program is free software; you can redistribute it 
-#   and/or modify it under the terms of the GNU General Public 
-#   License as published by the Free Software Foundation; 
-#   either version 2 of the License, or (at your option) 
+#
+#   This program is free software; you can redistribute it
+#   and/or modify it under the terms of the GNU General Public
+#   License as published by the Free Software Foundation;
+#   either version 2 of the License, or (at your option)
 #   any later version.
 #
-#   This program is distributed in the hope that it will be 
-#   useful, but WITHOUT ANY WARRANTY; without even the implied 
-#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #   PURPOSE.  See the GNU General Public License for more details.
-#   
-#   You should have received a copy of the GNU General Public 
-#   License along with this program; if not, write to the 
-#   Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
+#
+#   You should have received a copy of the GNU General Public
+#   License along with this program; if not, write to the
+#   Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
 #   MA 02139, USA.
 
 #   Routines for external matrix stuff
@@ -29,4 +29,24 @@ extmat.nrow <- function(X) {
 
 is.extmat <- function(X) {
   .Call("is_extmat", X)
+}
+
+extmat <- function(A) {
+  f <- function(v) A %*% v
+  tf <- function(v) tA %*% v
+
+  e <- new.env()
+  assign("A", A, e)
+  assign("tA", t(A), e)
+  environment(f) <- e
+  environment(tf) <- e
+
+  new.extmat(f, tf, nrow(A), ncol(A))
+}
+
+new.extmat <- function(f, tf, nrow, ncol,
+                       env = .GlobalEnv) {
+  .Call("initialize_extmat",
+        as.function(f), as.function(tf),
+        as.integer(nrow), as.integer(ncol), env)
 }
