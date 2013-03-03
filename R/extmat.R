@@ -31,22 +31,9 @@ is.extmat <- function(X) {
   .Call("is_extmat", X)
 }
 
-extmat <- function(A) {
-  f <- function(v) A %*% v
-  tf <- function(v) tA %*% v
-
-  e <- new.env()
-  assign("A", A, e)
-  assign("tA", t(A), e)
-  environment(f) <- e
-  environment(tf) <- e
-
-  new.extmat(f, tf, nrow(A), ncol(A))
-}
-
-new.extmat <- function(f, tf, nrow, ncol,
-                       env = .GlobalEnv) {
+extmat <- function(mul, tmul, nrow, ncol,
+                   env = .GlobalEnv) {
   .Call("initialize_extmat",
-        as.function(f), as.function(tf),
+        as.function(mul), as.function(tmul),
         as.integer(nrow), as.integer(ncol), env)
 }

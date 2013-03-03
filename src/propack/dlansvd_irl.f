@@ -301,8 +301,9 @@ c     | Test if an invariant subspace have been found |
 c     %-----------------------------------------------%
          if (ierr.lt.0) then
             if (dim.lt.k) then
-               write(*,*) 'WARNING: Invariant subspace found.',
-     c              ' Dimension = ',dim
+               call intpr
+     $              ("WARNING: Invariant subspace found. Dimension = ",
+     $              -1, dim, 1)
                info = dim
             endif
             goto 50
@@ -1043,7 +1044,7 @@ c     %-----------------%
 
       call second(t1)
       if (delta.lt.eta) then
-         write (*,*) 'Warning delta<eta in dcompute_int'
+c         write (*,*) 'Warning delta<eta in dcompute_int'
          return
       endif
 

@@ -481,7 +481,7 @@ void trl_set_debug(trl_info * info, int msglvl, char *filename)
   if (filename != NULL) {
     strcpy(info->log_file, filename);
     if (msglvl > 0) {
-      printf
+      Rprintf
         ("TRLAN will write diagnostic messages to files with prefix %s.\n",
          info->log_file);
     }
