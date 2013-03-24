@@ -451,21 +451,8 @@ end:
   if (ibas == 0)
     Free(base);
   clk1 = clock();
-  if (clk1 < info->clk_tot) {
-    info->tick_t +=
-      (info->clk_max -
-       info->clk_tot) / (double) (info->clk_rate);
-    info->tick_t +=
-      (info->clk_max + clk1) / (double) (info->clk_rate);
-    info->clk_tot = 0;
-  } else if (info->clk_tot < 0 && clk1 >= 0) {
-    info->tick_t -= info->clk_tot / (double) (info->clk_rate);
-    info->tick_t += clk1 / (double) (info->clk_rate);
-    info->clk_tot = 0;
-  } else {
-    info->tick_t  += (clk1 - info->clk_tot) / (double) (info->clk_rate);
-    info->clk_tot  = 0;
-  }
+  info->tick_t  += (clk1 - info->clk_tot) / (double) (info->clk_rate);
+  info->clk_tot  = 0;
 
   return;
 }
@@ -497,8 +484,9 @@ void trl_set_checkpoint(trl_info * info, int cpflag, char *file)
 }
 
 void trl_set_iguess(trl_info * info, int nec, int iguess, int nopts,
-                    char *cpf)
-{
+                    char *cpf) {
+  (void)nopts;
+
   /* assign nec and iguess flags to info */
   info->nec = nec;
   info->guess = iguess;
@@ -741,7 +729,6 @@ trl_check_ritz(trl_matprod op,
                int ldrvec, double *alpha, int *check, double *beta,
                double *eval, int lwrk, double *wrk, void *lparam)
 {
-  long c__1 = 1;
   int i__1 = 1;
   double d__1;
 /*
@@ -750,7 +737,7 @@ trl_check_ritz(trl_matprod op,
   gsumwrk -- workspace left over for trl_g_sum to use dimension of the input arrays
 */
   double *aq, *rq, *gsumwrk, *res, *err;
-  int i, aqi, rqi, gsumwrki, icheck;
+  int i, aqi, rqi, gsumwrki;
   double gapl, gapr;
 
   if (ncol <= 0)
@@ -800,11 +787,11 @@ trl_check_ritz(trl_matprod op,
   for (i = 0; i < ncol; i++) {
     op(&nrow, &i__1, &rvec[i * ldrvec], &nrow, aq, &nrow, lparam);
     /* Rayleigh quotient -- assuming rvec(:,i) has unit norm */
-    rq[i] = trl_ddot(nrow, &rvec[i * ldrvec], c__1, aq, c__1);
+    rq[i] = trl_ddot(nrow, &rvec[i * ldrvec], 1, aq, 1);
     trl_g_sum(info->mpicom, 1, &rq[i], gsumwrk);
     d__1 = -rq[i]; /* indent separated =- into = - */
-    trl_daxpy(nrow, d__1, &rvec[i * ldrvec], c__1, aq, c__1);
-    res[i] = trl_ddot(nrow, aq, c__1, aq, c__1);
+    trl_daxpy(nrow, d__1, &rvec[i * ldrvec], 1, aq, 1);
+    res[i] = trl_ddot(nrow, aq, 1, aq, 1);
   }
   trl_g_sum(info->mpicom, ncol, res, gsumwrk);
   for (i = 0; i < ncol; i++) {
@@ -844,7 +831,6 @@ trl_check_ritz(trl_matprod op,
             "           Ritz value       res norm   res diff  est error  diff w rq  act. error\n");
     if (beta != NULL && eval != NULL) {
       for (i = 0; i < ncol; i++) {
-        icheck = 0;
         fprintf(info->log_fp,
                 "%21.14f    %11.3e%11.3e%11.3e%11.3e %11.3e%11.3e\n",
                 alpha[i], res[i], beta[i] - res[i], err[i],
@@ -852,19 +838,16 @@ trl_check_ritz(trl_matprod op,
         /* check the accuracy of results.. */
         if (fabs(beta[i] - res[i]) > 0.00001) {
           *check = *check - 1;
-          icheck++;
         }
 
         if (fabs(rq[i] - alpha[i]) > nrow * nrow * info->tol) {
           *check = *check - 1;
-          icheck++;
         }
 
         if ((fabs(eval[i] - alpha[i]) >
              10 * nrow * nrow * info->tol) ||
             (fabs(eval[i] - alpha[i]) > 10 * err[i])) {
           *check = *check - 1;
-          icheck++;
         }
       }
 
@@ -873,15 +856,14 @@ trl_check_ritz(trl_matprod op,
         fprintf(info->log_fp, "%21.14f    %11.3e%11.3e%11.3e%11.3e\n",
                 alpha[i], res[i], beta[i] - res[i], err[i],
                 rq[i] - alpha[i]);
+
         /* check the accuracy of results.. */
         if (fabs(beta[i] - res[i]) > 0.00001) {
           *check = *check - 1;
-          icheck++;
         }
 
         if (fabs(rq[i] - alpha[i]) > nrow * nrow * info->tol) {
           *check = *check - 1;
-          icheck++;
         }
       }
     } else if (eval != NULL) {
@@ -917,7 +899,6 @@ void
 trl_rayleigh_quotients(trl_matprod op,
                        trl_info * info, int ncol, double *evec,
                        double *eres, double *base, void *lparam) {
-  int c__1 = 1;
   int i__1 = 1;
   double d__1;
   int i, nrow;
@@ -946,21 +927,21 @@ trl_rayleigh_quotients(trl_matprod op,
   /* quotient and compute residual norm of the new Ritz pairs            */
   for (i = 0; i < ncol; i++) {
     wrk[0] =
-      trl_ddot(nrow, &evec[i * nrow], c__1, &evec[i * nrow], c__1);
+      trl_ddot(nrow, &evec[i * nrow], 1, &evec[i * nrow], 1);
     op(&nrow, &i__1, &evec[i * nrow], &nrow, avec, &nrow, lparam);
-    wrk[1] = trl_ddot(nrow, &evec[i * nrow], c__1, avec, c__1);
+    wrk[1] = trl_ddot(nrow, &evec[i * nrow], 1, avec, 1);
     trl_g_sum(info->mpicom, 2, wrk, &wrk[2]);
     info->matvec = info->matvec + 1;
     if (wrk[0] > 0.0) {
       eres[i] = wrk[1] / wrk[0];
       d__1 = -eres[i];
-      trl_daxpy(nrow, d__1, &evec[i * nrow], c__1, avec, c__1);
-      wrk[1] = trl_ddot(nrow, avec, c__1, avec, c__1);
+      trl_daxpy(nrow, d__1, &evec[i * nrow], 1, avec, 1);
+      wrk[1] = trl_ddot(nrow, avec, 1, avec, 1);
       trl_g_sum(info->mpicom, 1, &wrk[1], &wrk[2]);
       wrk[0] = 1.0 / sqrt(wrk[0]);
       eres[ncol + i] = wrk[0] * sqrt(wrk[1]);
       d__1 = wrk[0];
-      trl_dscal(nrow, d__1, &evec[i * nrow], c__1);
+      trl_dscal(nrow, d__1, &evec[i * nrow], 1);
     } else {
       eres[i] = -DBL_MAX;
       eres[ncol + i] = -DBL_MAX;

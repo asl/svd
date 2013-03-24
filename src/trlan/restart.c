@@ -10,7 +10,7 @@
 #include "trlan.h"
 #include "trlan_i.h"
 
-#define nint(a) (ceil(a)-a > 0.5  ? (int)(a) : ceil(a))
+#define nint(a) (ceil(a)-a > 0.5  ? (int)(a) : (int)ceil(a))
 
 /*
   TRLAN Low level utility routines
@@ -49,9 +49,10 @@ static double trl_min_gap_ratio(trl_info * info, int nd, int tind,
                                 double *res);
 
 void trl_shuffle_eig(int nd, int mnd, double *lambda, double *res,
-                      trl_info * info, int *kept, int locked) {
+                     trl_info * info, int *kept, int locked) {
   int i, ncl, ncr, kl, kr, tind, minsep;
   double bnd;
+  (void)locked;
 
   // very small basis -- save the half with the smallest residual norms
   if (nd <= 5) {
@@ -347,6 +348,10 @@ void trl_restart_max_gap_cost_ratio(int n, int tind, trl_info * info,
 
   nd = info->ned;
   mn = info->maxlan;
+  min_l = info->locked;
+  min_gamma = 0;
+  min_gamma0 = 0;
+
   trl_restart_search_range(n, lambda, res, info, (*kl), (*kr),
                             &(info->lohi), tind, &k1, &k2);
   // ** Static approach to decide the minimum gap ratio **
@@ -381,10 +386,10 @@ void trl_restart_max_gap_cost_ratio(int n, int tind, trl_info * info,
   z2 = 1.0 / info->cfac;
   if (z2 < 1.0) {
     tmp = def2;
-    t = abs(k2 - k1) * def2;
+    t = (int)floor(abs(k2 - k1) * def2);
   } else if (z1 < 1.0) {
     tmp = def1;
-    t = abs(k2 - k1) * def1;
+    t = (int)floor(abs(k2 - k1) * def1);
   } else {
     tmp3 =
       log(z1 +
@@ -397,7 +402,7 @@ void trl_restart_max_gap_cost_ratio(int n, int tind, trl_info * info,
     tmp = atan(tmp) * M_2_PI;
     tmp = dw + (up - dw) * tmp;
 
-    t = abs(k2 - k1) * tmp;
+    t = (int)floor(abs(k2 - k1) * tmp);
   }
   //
   // ** Static approach to decided the minimum gap ratio **
@@ -529,6 +534,7 @@ void trl_restart_max_gap_cost_ratio_static(int n, int tind,
 
   nd = info->ned;
   mn = info->maxlan;
+  min_l = info->locked;
   trl_restart_search_range(n, lambda, res, info, (*kl), (*kr),
                             &(info->lohi), tind, &k1, &k2);
   //
@@ -551,17 +557,17 @@ void trl_restart_max_gap_cost_ratio_static(int n, int tind,
     tmp3 = -(tmp2 * (info->maxlan)) / log(info->tol * info->anrm);
     if (tmp3 >= 0.5 || info->klan < info->maxlan) {
       tmp = 0.8;
-      t = abs(k2 - k1) * 0.8;
+      t = nint(abs(k2 - k1) * 0.8);
     } else {
       tmp = trl_min_gap_ratio(info, nd, tind, res);
       tmp = tmp2 / tmp;
       tmp = pow(tmp, 0.25);
       tmp = atan(tmp) * (2.0 * M_2_PI);
-      t = abs(k2 - k1) * tmp;
+      t = nint(abs(k2 - k1) * tmp);
     }
   } else {
     tmp = 0.8;
-    t = abs(k2 - k1) * 0.8;
+    t = nint(abs(k2 - k1) * 0.8);
   }
   mn1 = nint(2.0 * (info->klan) / 5.0);
   min_val = 0.0;
@@ -581,7 +587,7 @@ void trl_restart_max_gap_cost_ratio_static(int n, int tind,
       l2 = l1 + info->locked;
       mn2 = mn1;
       if (mn1 < ((info->rfact) * l2))
-        mn2 = (info->rfact) * l2;
+        mn2 = nint((info->rfact) * l2);
       if (mn2 > mn)
         mn2 = mn;
       if (mn2 < nd)
@@ -1269,10 +1275,10 @@ void trl_restart_max_reduction(int nd, int tind, int kept, double *lambda,
   z2 = 1.0 / info->cfac;
   if (z2 < 1.0) {
     tmp = def2;
-    t = abs(krm - klm) * def2;
+    t = nint(abs(krm - klm) * def2);
   } else if (z1 < 1.0) {
     tmp = def1;
-    t = abs(krm - klm) * def1;
+    t = nint(abs(krm - klm) * def1);
   } else {
     tmp3 =
       log(z1 +
@@ -1286,7 +1292,7 @@ void trl_restart_max_reduction(int nd, int tind, int kept, double *lambda,
     tmp = atan(tmp) * M_2_PI;
     tmp = dw + (up - dw) * tmp;
 
-    t = abs(krm - klm) * tmp;
+    t = nint(abs(krm - klm) * tmp);
   }
   igap = t;
   if (igap > 2 && igap + kept > nd && info->crat > 0.0) {
@@ -1334,6 +1340,7 @@ void trl_restart_search_range(int nd, double *lambda, double *res,
                                int *lohi, int tind, int *klm, int *krm) {
   int j, klmi, krmi;
   double bnd;
+  (void)lambda;
 
   klmi = imax2(ncl, 0);
   krmi = imin2(ncr, nd - 1);
@@ -1387,6 +1394,7 @@ void trl_restart_search_range(int nd, double *lambda, double *res,
 */
 double trl_min_gap_ratio(trl_info * info, int nd, int tind, double *res) {
   double gamma;
+  (void)nd;
 
   gamma = info->maxmv * (info->nec + 1.0) / info->ned - info->matvec;
   if (gamma < info->klan) {

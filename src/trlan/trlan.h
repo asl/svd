@@ -53,7 +53,6 @@ typedef struct strct_trl_info {
 
     /* variables to store timing results */
     clock_t clk_rate;		/* system clock rate (SYSTEM_CLOCK)                 */
-    clock_t clk_max;		/* maximum counter value                            */
     clock_t clk_tot;		/* total time spent in TRLAN (in clock ticks)       */
     clock_t clk_op;		/* time in applying the operator (MATVEC)           */
     clock_t clk_orth;		/* time in re-orthogonalization                     */
@@ -62,9 +61,9 @@ typedef struct strct_trl_info {
     double tick_o;
     double tick_h;
     double tick_r;
-    int clk_in;			/* time spent in reading input data file           */
+    clock_t clk_in;			/* time spent in reading input data file           */
     int wrds_in;		/* number of real(8) words read                    */
-    int clk_out;		/* time spent in writing output data file          */
+    clock_t clk_out;		/* time spent in writing output data file          */
     int wrds_out;		/* number of real(8) words written to file         */
 
     double anrm;		/* norm of the operator used                       */

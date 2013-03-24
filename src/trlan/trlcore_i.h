@@ -1,97 +1,6 @@
 #ifndef __TRLANCORE_H
 #define __TRLANCORE_H
 
-void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
-                     clock_t clk1);
-/*
-  Purpose
-  =======
-  add clock ticks to a integer variable, if there is potential for
-  overflow convert it to floating-point numbers
-
-  Arguments
-  =========
-  info   (input) Pointer to structure trl_info.
-  On entry, points the current TRL_INFO. Used only to pass the maximum counter
-  value for the clock.
-
-  time   (input/output) Pointer to integer
-  On entry, contains the processor time spent in one of following operations:
-  clk_op    (in matrix-vector operation)
-  clk_orth  (in re-orthogonalization)
-  clk_res   (in restarting the Lanczos iterations)
-  In the case of overflow, the time is saved in rtime, i.e.,
-  total time = time + rtime.
-
-  rtime  (input/output) Pointer to double
-  On entry, contains the processor time spent in one of following operations:
-  tick_o   (in matrix-vector operation)
-  tick_h   (in re-orthogonalization)
-  tick_r   (in restarting the Lanczos iterations)
-
-  clk1   (input) clock_t
-  On entry, contains the processor time at the start of the time interval
-  we are interested in.
-
-*/
-void print_alpha_beta(trl_info * info, char *title, int i,
-                      double *alpha, double *beta);
-/*
-  Purpose
-  =======
-  Print the Ith alpha and beta value to the log file. Function trl_print_real_ is used.
-
-  Arguments
-  =========
-  info    (input) Pointer to structure trl_info_
-  On entry, points the current TRL_INFO. The information is printed out to the
-  log file specified in trl_info.
-
-  title   (workspace) String of length (STRING_LEN)
-  On entry, provides the space to store the title to print out, i.e., "alpha(jnd) ="
-  and "beta(jnd) =".
-
-  i       (input) Integer
-  On entry, specifies the index of alpha and beta to print out.
-
-  alpha   (input) Double array of dimension (info->maxlan)
-  On entry, contains the alpha values.
-
-  beta    (input) Double array of dimension (info->maxlan)
-  On entry, contains the beta values.
-
-
-*/
-void print_all_alpha_beta(trl_info * info, char *title, int jnd,
-                          double *alfrot, double *betrot);
-/*
-  Purpose
-  =======
-  Print all computed alpha and beta to the log file. Function trl_print_real_ is used.
-
-  Arguments
-  =========
-  info     (input) Pointer to structure trl_info_
-  On entry, points to the current TRL_INFO. The information is printed out to
-  the log file specified in info.
-
-  title    (workspace) String of length (12+digit of jnd)
-  On entry, provides the space to store the title to print out, i.e., "alfrot(1:jnd)..",
-  and "beta(1:jnd).."
-
-  jnd      (input) Integer
-  On entry, specifies the number of alpha and beta computed so far.
-
-  alfrot   (input) Double precision array of dimension (info->maxlan)
-  On entry, contains the alpha computed so far.
-
-  betrot   (input) Double precision array of dimension (info->maxlan)
-  On entry, contains the beta computed so far.
-
-
-*/
-void print_lambda_res(trl_info * info, int jnd, double *lambda,
-                      double *res);
 /*
   Purpose
   =======
@@ -538,7 +447,7 @@ void trl_get_eval(int nd, int locked, double *alpha, double *beta,
 
 */
 void trl_set_locking(int jnd, int nlam, double *lambda, double *res,
-                     double *yy, int anrm, int *locked);
+                     double *yy, double anrm, int *locked);
 /*
   Purpose
   =======

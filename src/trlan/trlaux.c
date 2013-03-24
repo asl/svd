@@ -128,7 +128,6 @@ void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
                     int lwrk)
 {
   double one = 1.0, zero = 0.0;
-  long c__1 = 1;
   int i, j, k, jnd;
   double nrmfro, nrminf;
 
@@ -162,8 +161,8 @@ void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
         fprintf(info->log_fp, "\n");
     }
     nrmfro =
-      nrmfro + 2 * trl_ddot(i, wrk, c__1, wrk,
-                            c__1) + wrk[i] * wrk[i];
+      nrmfro + 2 * trl_ddot(i, wrk, 1, wrk,
+                            1) + wrk[i] * wrk[i];
     if (i == 0) {
       wrk[i + 1] = fabs(wrk[i]);
     } else {
@@ -188,8 +187,8 @@ void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
         fprintf(info->log_fp, "\n");
     }
     nrmfro =
-      nrmfro + 2 * trl_ddot(j, wrk, c__1, wrk,
-                            c__1) + wrk[j] * wrk[j];
+      nrmfro + 2 * trl_ddot(j, wrk, 1, wrk,
+                            1) + wrk[j] * wrk[j];
     nrminf = fmax2(nrminf, fabs(wrk[j]));
   }
   fprintf(info->log_fp,
@@ -207,13 +206,15 @@ trl_check_recurrence(trl_matprod op,
                      int kept, double *alpha, double *beta, double *wrk,
                      int lwrk, void *lparam)
 {
-  long c__1 = 1;
   int i__1 = 1;
   double zero = 0.0, one = 1.0;
   int i, ii, j, j1, j2, jnd, mv1;
   char title[TRLAN_STRING_LEN];
   double d__1;
   double *aq = NULL, *qkp1, *cs, *alf, *bet;
+
+  (void)ld1; (void)ld2;
+  
   mv1 = m1;
   if (m2 > 0) {
     j2 = m2 - 1;
@@ -274,33 +275,33 @@ trl_check_recurrence(trl_matprod op,
   */
   if (jnd > kept) {
     op(&nrow, &i__1, qkp1, &nrow, aq, &nrow, lparam);
-    alf[kept] = trl_ddot(nrow, aq, c__1, qkp1, c__1);
+    alf[kept] = trl_ddot(nrow, aq, 1, qkp1, 1);
     d__1 = -alpha[kept];
-    trl_daxpy(nrow, d__1, qkp1, c__1, aq, c__1);
+    trl_daxpy(nrow, d__1, qkp1, 1, aq, 1);
     for (i = 0; i < imin2(j1, kept); i++) {
       d__1 = -beta[i];
-      trl_daxpy(nrow, d__1, &v1[i * nrow], c__1, aq, c__1);
+      trl_daxpy(nrow, d__1, &v1[i * nrow], 1, aq, 1);
     }
     for (i = 0; i < kept - j1; i++) {
       j = j1 + i;
       d__1 = -beta[j];
-      trl_daxpy(nrow, d__1, &v2[i * nrow], c__1, aq, c__1);
+      trl_daxpy(nrow, d__1, &v2[i * nrow], 1, aq, 1);
     }
-    bet[kept] = trl_ddot(nrow, aq, c__1, aq, c__1);
+    bet[kept] = trl_ddot(nrow, aq, 1, aq, 1);
     if (kept + 2 <= j1) {
       cs[kept] =
-        trl_ddot(nrow, aq, c__1, &v1[(kept + 1) * nrow], c__1);
+        trl_ddot(nrow, aq, 1, &v1[(kept + 1) * nrow], 1);
       d__1 = -beta[kept];
-      trl_daxpy(nrow, d__1, &v1[(kept + 1) * nrow], c__1, aq, c__1);
+      trl_daxpy(nrow, d__1, &v1[(kept + 1) * nrow], 1, aq, 1);
     } else {
       cs[kept] =
-        trl_ddot(nrow, aq, c__1, &v2[(kept + 1 - j1) * nrow],
-                 c__1);
+        trl_ddot(nrow, aq, 1, &v2[(kept + 1 - j1) * nrow],
+                 1);
       d__1 = -beta[kept];
-      trl_daxpy(nrow, d__1, &v2[(kept + 1 - j1) * nrow], c__1, aq,
-                c__1);
+      trl_daxpy(nrow, d__1, &v2[(kept + 1 - j1) * nrow], 1, aq,
+                1);
     }
-    wrk[kept] = trl_ddot(nrow, aq, c__1, aq, c__1);
+    wrk[kept] = trl_ddot(nrow, aq, 1, aq, 1);
   }
   /*
     the third kind of relation -- normal three term recurrence
@@ -388,7 +389,7 @@ trl_check_recurrence(trl_matprod op,
   trl_print_real(info, title, jnd, alf, 1);
   strcpy(title, "Differences in alpha ..");
   d__1 = -one;
-  trl_daxpy(jnd, d__1, alpha, c__1, alf, c__1);
+  trl_daxpy(jnd, d__1, alpha, 1, alf, 1);
   trl_print_real(info, title, jnd, alf, 1);
   strcpy(title, "Beta computed by TRLAN ..");
   trl_print_real(info, title, jnd, beta, 1);
@@ -396,7 +397,7 @@ trl_check_recurrence(trl_matprod op,
   trl_print_real(info, title, jnd, bet, 1);
   strcpy(title, "Differences in beta ..");
   d__1 = -one;
-  trl_daxpy(jnd, d__1, beta, c__1, bet, c__1);
+  trl_daxpy(jnd, d__1, beta, 1, bet, 1);
   trl_print_real(info, title, jnd, bet, 1);
   strcpy(title, "Error in Lanczos recurrence (overall) =");
   trl_print_real(info, title, 1, aq, 1);
@@ -428,6 +429,7 @@ int trl_write_checkpoint(char *filename, int nrow, double *alpha,
 {
   int jnd, i, j;
   FILE *io_fp;
+  (void)lde; (void)ldb;
 
   jnd = me + nb - 1;
   io_fp = fopen(filename, "w");
@@ -548,19 +550,20 @@ int trl_read_checkpoint(char *filename, int nrow, double *evec, int lde,
   return close_file(io_fp, 0, -215);
 }
 
-int indchar(char *a, char b) {
+static ptrdiff_t indchar(char *a, char b) {
   char *t = strchr(a, b);
 
   if (t != NULL) {
-    return (1 + (t - a));
+    return ((t - a) + 1);
   } else {
     return strlen(a) + 1;
   }
 }
 
-void trl_pe_filename(int nlen, char *filename, char *base, int my_rank,
+void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
                      int npe) {
-  int lead, ndig, len, off;
+  int lead, ndig, off;
+  size_t len;
   char *format;
 
   ndig = 1;

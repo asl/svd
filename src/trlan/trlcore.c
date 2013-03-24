@@ -25,30 +25,13 @@
 /* Following are the internal subroutines for printing etc used in function
    lanczos_ */
 
-void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
-                     clock_t clk1)
-{
+static void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
+                            clock_t clk1) {
   clock_t clk2, clk3;
 
   clk2 = clock();
-#ifdef __CLK_RESTART
-  if (clk2 <= clk1) {
-    clk3  = (info->clk_max - clk1);
-    clk3 += clk2;
-  } else {
-    clk3 = clk2 - clk1;
-  }
-#else
-  if (clk2 < clk1) {
-    clk3  = (info->clk_max - clk1);
-    clk3 += (info->clk_max + clk2);
-  } else if (clk1 < 0 && clk2 >= 0) {
-    clk3  = -clk1;
-    clk3 +=  clk2;
-  } else {
-    clk3 = clk2 - clk1;
-  }
-#endif
+  clk3 = clk2 - clk1;
+
   if (clk3 + (*time) >= (*time)) {
     *time = clk3 + *time;
   } else {
@@ -57,27 +40,24 @@ void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
   }
 }
 
-void print_alpha_beta(trl_info * info, char *title, int i,
-                      double *alpha, double *beta)
-{
+static void print_alpha_beta(trl_info * info, char *title, int i,
+                      double *alpha, double *beta) {
   sprintf(title, " alpha(%d) =", i);
   trl_print_real(info, title, 1, &alpha[i - 1], 1);
   sprintf(title, "  beta(%d) =", i);
   trl_print_real(info, title, 1, &beta[i - 1], 1);
 }
 
-void print_all_alpha_beta(trl_info * info, char *title, int jnd,
-                          double *alfrot, double *betrot)
-{
+static void print_all_alpha_beta(trl_info * info, char *title, int jnd,
+                                 double *alfrot, double *betrot)  {
   sprintf(title, "alfrot(1:%d)..", jnd);
   trl_print_real(info, title, jnd, alfrot, 1);
   sprintf(title, "betrot(1:%d)..", jnd);
   trl_print_real(info, title, jnd, betrot, 1);
 }
 
-void print_lambda_res(trl_info * info, int jnd, double *lambda,
-                      double *res)
-{
+static void print_lambda_res(trl_info * info, int jnd, double *lambda,
+                             double *res) {
   trl_print_real(info, "Current eigenvalues..", jnd, lambda, 1);
   trl_print_real(info, "Current residual norms..", jnd, res, 1);
 }
@@ -88,7 +68,6 @@ void print_restart_state(trl_info * info, char *title, int nrow,
                          int kept, int locked, int *iwrk, double *wrk2,
                          int i2, int jml)
 {
-  long c__1 = 1;
   int i, j1, j2;
 
   iwrk[0] = kept + locked;
@@ -112,8 +91,8 @@ void print_restart_state(trl_info * info, char *title, int nrow,
     for (j1 = 0; j1 < imin2(kept, info->verbose); j1++) {
       for (j2 = 0; j2 <= j1; j2++) {
         wrk2[j2] =
-          trl_ddot(jml, &yy[j2 * jml], c__1, &yy[j1 * jml],
-                   c__1);
+          trl_ddot(jml, &yy[j2 * jml], 1, &yy[j1 * jml],
+                   1);
       }
       wrk2[j1] = wrk2[j1] - 1;
       sprintf(title, "Orthogonality level of y(%d) ..", j1 + 1);
@@ -167,18 +146,15 @@ void write_checkpoint(trl_info * info, char *title, int nrow,
                       double *base, int lde, int j1n, int jnd, int ldb,
                       int j2n)
 {
-  int ii, c1, c2;
+  int ii;
+  clock_t c1, c2;
 
   trl_pe_filename(138, title, info->cpfile, info->my_pe, info->npes);
   c1 = clock();
   ii = trl_write_checkpoint(title, nrow, alpha, beta, evec, lde, j1n,
                             base, ldb, j2n);
   c2 = clock();
-  if (c2 > c1) {
-    info->clk_out = info->clk_out + (c2 - c1);
-  } else {
-    info->clk_out = info->clk_out + ((info->clk_max - c1) + c2);
-  }
+  info->clk_out = info->clk_out + (c2 - c1);
   info->wrds_out = info->wrds_out + jnd * (nrow + nrow + 2) + nrow + 2;
   info->stat = trl_sync_flag(info->mpicom, ii);
 }
@@ -251,7 +227,6 @@ trlanczos(trl_matprod op,
           double *evec, int lde, double *base, int ldb, int nbas,
           double *wrk, int lwrk, void *lparam) {
   char notrans = 'N';
-  int c__1 = 1;
   int i__1 = 1;
   double one = 1.0;
 
@@ -417,35 +392,13 @@ trlanczos(trl_matprod op,
     // record the total time and the time in MATVEC
     */
     clk1 = clock();
-#ifdef __CLK_RESTART
-    if (clk1 <= info->clk_tot) {
-      info->tick_t +=
-        (info->clk_max -
-         info->clk_tot) / (double) (info->clk_rate);
-      info->tick_t += clk1 / (double) (info->clk_rate);
-      info->clk_tot = clk1;
-    }
-#else
-    if (clk1 < info->clk_tot) {
-      info->tick_t +=
-        (info->clk_max -
-         info->clk_tot) / (double) (info->clk_rate);
-      info->tick_t +=
-        (info->clk_max + clk1) / (double) (info->clk_rate);
-      info->clk_tot = clk1;
-    } else if (info->clk_tot < 0 && clk1 >= 0) {
-      info->tick_t -= info->clk_tot / (double) (info->clk_rate);
-      info->tick_t += clk1 / (double) (info->clk_rate);
-      info->clk_tot = clk1;
-    }
-#endif
     op(&nrow, &i__1, qa, &ldqa, rr, &ldrr, lparam);
     add_clock_ticks(info, &(info->clk_op), &(info->tick_o), clk1);
     (info->matvec)++;
     /*
     // computed the next alpha = qa' * A * qa
     */
-    alpha[jnd - 1] = trl_ddot(nrow, qa, c__1, rr, c__1);
+    alpha[jnd - 1] = trl_ddot(nrow, qa, 1, rr, 1);
     trl_g_sum(info->mpicom, 1, &alpha[jnd - 1], wrk2);
     /*
     // Perform the Lanczos orthogonalization.
@@ -462,24 +415,24 @@ trlanczos(trl_matprod op,
       // compute rr = rr - [evec(:,1),...,evec(:,i1)]*[beta(1),...,beta(i1)]'
       */
       d__1 = -one;
-      trl_dgemv(&notrans, nrow, j1, d__1, evec, lde, beta, c__1, one,
-                rr, c__1);
+      trl_dgemv(&notrans, nrow, j1, d__1, evec, lde, beta, 1, one,
+                rr, 1);
     } else if (j1 == 1) {
       /*
       // there is no beta, so just compute
       //   rr = rr - alpha(1)*qa
       */
       d__1 = -alpha[0];
-      trl_daxpy(nrow, d__1, qa, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, qa, 1, rr, 1);
     } else if (j1 == 2) {
       /*
       // there is only one beta, so just do
       //   rr = rr - beta(1)*evec(1:nrow,1) - beta(2)*evec(1:nrow,2)
       */
       d__1 = -beta[0];
-      trl_daxpy(nrow, d__1, evec, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, evec, 1, rr, 1);
       d__1 = -beta[1];
-      trl_daxpy(nrow, d__1, &evec[lde], c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, &evec[lde], 1, rr, 1);
     }
     /*
     // orthogonalize with lanczos vectors stored in base, now.
@@ -489,24 +442,24 @@ trlanczos(trl_matprod op,
       // compute rr = rr - [evec(:,1),...,evec(:,i1)]*[beta(j1+1),...,beta(j1+j2)]'
       */
       d__1 = -one;
-      trl_dgemv(&notrans, nrow, j2, d__1, base, ldb, &beta[j1], c__1,
-                one, rr, c__1);
+      trl_dgemv(&notrans, nrow, j2, d__1, base, ldb, &beta[j1], 1,
+                one, rr, 1);
     } else if (j2 == 1) {
       /*
       // there is no beta, so just compute
       //   rr = rr - beta(jnd)*qa
       */
       d__1 = -beta[jnd - 1];
-      trl_daxpy(nrow, d__1, qa, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, qa, 1, rr, 1);
     } else if (j2 == 2) {
       /*
       // there is only one beta, so just do
       // rr = rr - beta(j1+1)*base(1:nrow,1) - beta(jnd)*base(1:nrow,2)
       */
       d__1 = -beta[j1];
-      trl_daxpy(nrow, d__1, base, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, base, 1, rr, 1);
       d__1 = -beta[jnd - 1];
-      trl_daxpy(nrow, d__1, &base[ldb], c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, &base[ldb], 1, rr, 1);
     }
     /*
     // perform re-orthogonalization (full-orthogonalization)
@@ -589,16 +542,16 @@ trlanczos(trl_matprod op,
       info->matvec = info->matvec + 1;
       //
       /* compute alpha(jnd) = qa' * A * qa */
-      alpha[jnd - 1] = trl_ddot(nrow, qa, c__1, rr, c__1);
+      alpha[jnd - 1] = trl_ddot(nrow, qa, 1, rr, 1);
       trl_g_sum(info->mpicom, 1, &alpha[jnd - 1], wrk2);
       /*
       // the Lanczos orthogonalization (three-term recurrence).
       //   rr = rr - alpha(jnd)*qa - beta(jnd-1)*qb
       */
       d__1 = -alpha[jnd - 1];
-      trl_daxpy(nrow, d__1, qa, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, qa, 1, rr, 1);
       d__1 = -beta[jnd - 2];
-      trl_daxpy(nrow, d__1, qb, c__1, rr, c__1);
+      trl_daxpy(nrow, d__1, qb, 1, rr, 1);
       /*
       // re-orthogonalization, and compute beta(jnd)
       */
@@ -656,9 +609,7 @@ trlanczos(trl_matprod op,
           // assuming a same number of matrix-vector product is required for
           // each eigenvalues to converge.
           */
-          next_test =
-            (double) (info->ned * info->matvec) /
-            (double) (info->nec);
+          next_test = (info->ned * info->matvec / info->nec);
         } else if (info->nec == 0) {
           next_test = next_test + next_test;
           if (info->maxlan == info->ntot) {
@@ -692,25 +643,6 @@ trlanczos(trl_matprod op,
                              base, ldb, j2n, kept, alpha, beta,
                              wrk2, i2, lparam);
       }
-    }
-    /*
-    // convert the integer counters to floating-point counters
-    */
-    i2 = info->clk_max / 4;
-    if (info->clk_op > i2) {
-      info->tick_o =
-        info->tick_o + info->clk_op / (double) (info->clk_rate);
-      info->clk_op = 0;
-    }
-    if (info->clk_orth > i2) {
-      info->tick_h =
-        info->tick_h + info->clk_orth / (double) (info->clk_rate);
-      info->clk_orth = 0;
-    }
-    if (info->clk_res > i2) {
-      info->tick_r =
-        info->tick_r + info->clk_res / (double) (info->clk_rate);
-      info->clk_res = 0;
     }
     /*
     // *** Determine whether to restart ***
@@ -1027,10 +959,10 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
                        double *beta, int *j1, int *j2, trl_info * info,
                        double *wrk, int lwrk)
 {
-  long c__1 = 1;
   int i, j, k, nran, north;
   double tmp, rnrm;
   clock_t ii, jj;
+  int kk;
   char file[TRLAN_STRING_LEN];
 
   // generate random seeds based on current clock ticks
@@ -1058,11 +990,7 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
                             (mev + nbas - 1 - j), &beta[j]);
     info->stat = trl_sync_flag(info->mpicom, i);
     jj = clock();
-    if (jj > ii) {
-      info->clk_in = jj - ii;
-    } else {
-      info->clk_in = (info->clk_max - ii) + jj;
-    }
+    info->clk_in = jj - ii;
     info->wrds_in = (*j1 + *j2) * (nrow + nrow + 2) + nrow + 2;
     *j1 = *j1 + info->nec;
     if (info->stat != 0)
@@ -1083,9 +1011,9 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
           wrk[k] = unif_rand();
         }
         for (i = 0; i < nran - 1; i += 2) {
-          ii = (int) (nrow * wrk[i]);
-          evec[j * lde + ii] =
-            evec[j * lde + ii] + wrk[i + 1] - 0.5;
+          kk = (int) (nrow * wrk[i]);
+          evec[j * lde + kk] =
+            evec[j * lde + kk] + wrk[i + 1] - 0.5;
         }
       } else if (nran >= nrow) {
         for (i = 0; i < nrow; i++) {
@@ -1101,7 +1029,7 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
   }
   tmp = 0.0;
   // make sure the norm of the next vector can be computed
-  wrk[0] = trl_ddot(nrow, &evec[j * lde], c__1, &evec[j * lde], c__1);
+  wrk[0] = trl_ddot(nrow, &evec[j * lde], 1, &evec[j * lde], 1);
   trl_g_sum(info->mpicom, 1, &wrk[0], &wrk[1]);
   if (wrk[0] >= DBL_MIN && wrk[0] <= DBL_MAX) {
     // set rnrm to let trl_CGS normalize evec(1:nrow, j)
@@ -1137,12 +1065,12 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
   if (info->verbose > 6) {
     if (*j1 < mev) {
       i = *j1 + 1;
-      ii = *j2;
+      kk = *j2;
     } else {
       i = *j1;
-      ii = *j2 + 1;
+      kk = *j2 + 1;
     }
-    trl_check_orth(info, nrow, evec, lde, *j1, base, ldb, ii, wrk,
+    trl_check_orth(info, nrow, evec, lde, *j1, base, ldb, kk, wrk,
                    lwrk);
   }
   return;
@@ -1153,7 +1081,6 @@ void trl_orth(int nrow, double *v1, int ld1, int m1, double *v2, int ld2,
               double *wrk, int lwrk, trl_info * info)
 {
   double zero = 0.0, one = 1.0;
-  long c__1 = 1;
   double d__1;
   int i, usecgs, jnd, jm1, no, nr;
   double tmp;
@@ -1172,7 +1099,7 @@ void trl_orth(int nrow, double *v1, int ld1, int m1, double *v2, int ld2,
 //
 // compute the norm of the vector RR
 //
-  wrk[0] = trl_ddot(nrow, rr, c__1, rr, c__1);
+  wrk[0] = trl_ddot(nrow, rr, 1, rr, 1);
   trl_g_sum(info->mpicom, 1, &wrk[0], &wrk[1]);
   if (!(wrk[0] >= zero) || !(wrk[0] <= DBL_MAX)) {
     info->stat = -102;
@@ -1183,7 +1110,7 @@ void trl_orth(int nrow, double *v1, int ld1, int m1, double *v2, int ld2,
   if (jm1 > kept) {
     tmp += (beta[jm1 - 1] * beta[jm1 - 1]);
   } else if (kept > 0) {
-    tmp += trl_ddot(jm1, beta, c__1, beta, c__1);
+    tmp += trl_ddot(jm1, beta, 1, beta, 1);
   }
 
   if (jm1 == kept) {
@@ -1232,11 +1159,11 @@ void trl_orth(int nrow, double *v1, int ld1, int m1, double *v2, int ld2,
     trl_g_sum(info->mpicom, 2, &wrk[0], &wrk[2]);
     alpha[jnd - 1] = alpha[jnd - 1] + wrk[0];
     d__1 = -wrk[0];
-    trl_daxpy(nrow, d__1, qa, c__1, rr, c__1);
+    trl_daxpy(nrow, d__1, qa, 1, rr, 1);
     d__1 = -wrk[1];
-    trl_daxpy(nrow, d__1, qb, c__1, rr, c__1);
+    trl_daxpy(nrow, d__1, qb, 1, rr, 1);
     tmp = one / beta[jnd - 1];
-    trl_dscal(nrow, tmp, rr, c__1);
+    trl_dscal(nrow, tmp, rr, 1);
   } else {
     // perform local re-orthogonalization against the only vector
     if (m1 == 1) {
@@ -1244,13 +1171,13 @@ void trl_orth(int nrow, double *v1, int ld1, int m1, double *v2, int ld2,
     } else {
       qa = v2;
     }
-    wrk[0] = trl_ddot(nrow, qa, c__1, rr, c__1);
+    wrk[0] = trl_ddot(nrow, qa, 1, rr, 1);
     trl_g_sum(info->mpicom, 1, &wrk[0], &wrk[1]);
     alpha[jnd - 1] = alpha[jnd - 1] + wrk[0];
     d__1 = -wrk[0];
-    trl_daxpy(nrow, d__1, qa, c__1, rr, c__1);
+    trl_daxpy(nrow, d__1, qa, 1, rr, 1);
     tmp = one / beta[jnd - 1];
-    trl_dscal(nrow, tmp, rr, c__1);
+    trl_dscal(nrow, tmp, rr, 1);
   }
   // when beta(jnd) is exceedingly small, it should be treated as zero
   if (info->stat == 0) {
@@ -1317,7 +1244,7 @@ void trl_get_eval(int nd, int locked, double *alpha, double *beta,
                   double *lambda, double *res, double *wrk, int lwrk,
                   int *ierr) {
   int i;
-  int d__1, d__2;
+  int d__2;
 
   if (lwrk > 3 * nd) {
     *ierr = 0;
@@ -1327,8 +1254,7 @@ void trl_get_eval(int nd, int locked, double *alpha, double *beta,
   }
   memcpy(lambda, alpha, nd * sizeof(double));
   memcpy(wrk, &beta[locked], (nd - locked) * sizeof(double));
-  d__1 = (long) (nd - locked);
-  dstqrb(d__1, &lambda[locked], wrk, &res[locked], &wrk[nd], &d__2);
+  dstqrb(nd - locked, &lambda[locked], wrk, &res[locked], &wrk[nd], &d__2);
   *ierr = (int) d__2;
   if (*ierr == 0) {
     memset(res, 0, locked * sizeof(double));
@@ -1516,7 +1442,6 @@ void trl_get_tvec(int nd, double *alpha, double *beta, int irot, int nrot,
                   int *iwrk, double *wrk, int lwrk, int *ierr)
 {
   char notrans = 'N';
-  int c__1 = 1;
   double zero = 0.0, one = 1.0;
   int i, j, k, ncol, ii, ioff;
 
@@ -1562,7 +1487,7 @@ void trl_get_tvec(int nd, double *alpha, double *beta, int irot, int nrot,
         }
       } else {
         trl_dgemv(&notrans, nrot, nrot, one, rot, nrot,
-                  &yy[(i - 1) * nd + irot], c__1, zero, wrk, c__1);
+                  &yy[(i - 1) * nd + irot], 1, zero, wrk, 1);
         memcpy(&yy[(i - 1) * nd + irot], wrk,
                nrot * sizeof(double));
       }
@@ -1699,7 +1624,7 @@ void trl_get_tvec_a(int nd, int kept, double *alpha, double *beta,
 
 #define small(tmp,eps) (fabs(tmp) >= (eps) ? (eps)*fabs(tmp) : (eps)*(eps)*(anrm))
 void trl_set_locking(int jnd, int nlam, double *lambda, double *res,
-                     double *yy, int anrm, int *locked)
+                     double *yy, double anrm, int *locked)
 {
   double zero = 0.0;
   int i, j, ii, ioff;
@@ -1767,7 +1692,6 @@ void trl_ritz_vectors(int nrow, int lck, int ny, double *yy, int ldy,
 {
   char notrans = 'N';
   double zero = 0.0, one = 1.0;
-  int c__1 = 1;
   int i, j, k, stride, ii, jl1, jl2, il1, il2, kv1;
 
   // vec1*yy and vec2*yy where vec1 and vec2 are kept-locked
@@ -1833,17 +1757,17 @@ void trl_ritz_vectors(int nrow, int lck, int ny, double *yy, int ldy,
       k = j - i + 1;
       if (jl1 > 0) {
         trl_dgemv(&notrans, k, jl1, one,
-                  &vec1[(il1 - 1) * ld1 + i], ld1, yy, c__1, zero,
-                  wrk, c__1);
+                  &vec1[(il1 - 1) * ld1 + i], ld1, yy, 1, zero,
+                  wrk, 1);
         if (jl2 > 0) {
           trl_dgemv(&notrans, k, jl2, one,
                     &vec2[(il2 - 1) * ld2 + i], ld2, &yy[jl1],
-                    c__1, one, wrk, c__1);
+                    1, one, wrk, 1);
         }
       } else {
         trl_dgemv(&notrans, k, jl2, one,
-                  &vec2[(il2 - 1) * ld2 + i], ld2, &yy[jl1], c__1,
-                  zero, wrk, c__1);
+                  &vec2[(il2 - 1) * ld2 + i], ld2, &yy[jl1], 1,
+                  zero, wrk, 1);
       }
       if (kv1 > 0) {
         memcpy(&vec1[(il1 - 1) * ld1 + i], wrk,
@@ -1860,13 +1784,13 @@ int trl_cgs(trl_info * info, int nrow, double *v1, int ld1, int m1,
             double *v2, int ld2, int m2, double *rr, double *rnrm,
             double *alpha, int *north, double *wrk)
 {
-  long c__1 = 1;
   char notrans = 'N';
   double one = 1.0, zero = 0.0;
   const int maxorth = 3;
   double d__1;
   int mpicom, myid, i, j, k, nold, irnd, cnt, ierr = 0;
   double tmp, old_rnrm;
+  (void)alpha;
 
   mpicom = info->mpicom;
   myid = info->my_pe;
@@ -1883,25 +1807,25 @@ int trl_cgs(trl_info * info, int nrow, double *v1, int ld1, int m1,
       trl_g_dot(mpicom, nrow, v1, ld1, m1, v2, ld2, m2, rr, wrk);
       if (m1 > 1) {
         d__1 = -one;
-        trl_dgemv(&notrans, nrow, m1, d__1, v1, ld1, wrk, c__1,
-                  one, rr, c__1);
+        trl_dgemv(&notrans, nrow, m1, d__1, v1, ld1, wrk, 1,
+                  one, rr, 1);
       } else if (m1 == 1) {
         d__1 = -wrk[0];
-        trl_daxpy(nrow, d__1, v1, c__1, rr, c__1);
+        trl_daxpy(nrow, d__1, v1, 1, rr, 1);
       }
       if (m2 > 1) {
         d__1 = -one;
         trl_dgemv(&notrans, nrow, m2, d__1, v2, ld2, &wrk[m1],
-                  c__1, one, rr, c__1);
+                  1, one, rr, 1);
       } else if (m2 == 1) {
         d__1 = -wrk[nold - 1];
-        trl_daxpy(nrow, d__1, v2, c__1, rr, c__1);
+        trl_daxpy(nrow, d__1, v2, 1, rr, 1);
       }
 
       (*north)++;
       cnt = cnt + 1;
-      tmp = trl_ddot(nold, wrk, c__1, wrk, c__1);
-      wrk[0] = trl_ddot(nrow, rr, c__1, rr, c__1);
+      tmp = trl_ddot(nold, wrk, 1, wrk, 1);
+      wrk[0] = trl_ddot(nrow, rr, 1, rr, 1);
       trl_g_sum(mpicom, 1, wrk, &wrk[1]);
       *rnrm = sqrt(wrk[0]);
       old_rnrm = sqrt(wrk[0] + tmp);
@@ -1980,7 +1904,7 @@ int trl_cgs(trl_info * info, int nrow, double *v1, int ld1, int m1,
   if (ierr == 0) {
     if (*rnrm > DBL_MIN) {
       tmp = one / *rnrm;
-      trl_dscal(nrow, tmp, rr, c__1);
+      trl_dscal(nrow, tmp, rr, 1);
     } else {
       return -204;
     }
@@ -1992,19 +1916,25 @@ int trl_cgs(trl_info * info, int nrow, double *v1, int ld1, int m1,
 
 int trl_check_dgen(trl_info * info, int jnd, double *lambda,
                    double *res) {
-  /*
-    if( info->nec >= info->ned ) {
-    if( (info->lohi == -1 || info->lohi == 0 ) &&
-    (lambda[info->nec]  +res[info->nec]   > lambda[info->nec+1] &&
-    lambda[info->nec+1]-res[info->nec+1] < lambda[info->nec]) ) {
-    return 1;
+#if 0
+  if (info->nec >= info->ned) {
+    if ((info->lohi == -1 || info->lohi == 0) &&
+        (lambda[info->nec]  +res[info->nec]   > lambda[info->nec+1] &&
+         lambda[info->nec+1]-res[info->nec+1] < lambda[info->nec]) ) {
+      return 1;
     }
-    if( (info->lohi == 1 || info->lohi == 0 ) &&
-    (lambda[jnd-info->nec+1]-res[jnd-info->nec+1] < lambda[jnd-info->nec] &&
-    lambda[jnd-info->nec]  +res[jnd-info->nec]   > lambda[jnd-info->nec+1]) ) {
-    return 1;
+    if ((info->lohi == 1 || info->lohi == 0) &&
+        (lambda[jnd-info->nec+1]-res[jnd-info->nec+1] < lambda[jnd-info->nec] &&
+         lambda[jnd-info->nec]  +res[jnd-info->nec]   > lambda[jnd-info->nec+1]) ) {
+      return 1;
     }
-    }
-  */
+  }
+#else
+  (void)info;
+  (void)jnd;
+  (void)lambda;
+  (void)res;
+#endif
+  
   return -1;
 }

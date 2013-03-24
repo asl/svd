@@ -19,6 +19,8 @@
 void trl_init_info(trl_info * info, int nrow, int mxlan, int lohi,
                    int ned, double tol, int restart, int maxmv,
                    int mpicom) {
+  (void)mpicom;
+
   if (tol > 0) {
     info->tol = tol;
     if (info->tol <= DBL_MIN) {
@@ -57,20 +59,6 @@ void trl_init_info(trl_info * info, int nrow, int mxlan, int lohi,
   info->north = 0;
   info->nrand = 0;
   info->clk_rate = CLOCKS_PER_SEC;
-#ifdef __64INT
-  info->clk_max = 9223372036854775807LL;
-#else
-  info->clk_max = (clock_t) (pow(2.0, (8.0 * sizeof(clock_t) - 1.0))-1.0);
-  if (info->clk_max < 0) {
-    if (sizeof(clock_t) == 8) {
-      info->clk_max = 9223372036854775807LL;
-    } else {
-      error("error initializing clock.");
-    }
-  }
-#endif
-  if ((double)(info->clk_max) <= 0)
-    error( "??\n" );
   info->clk_tot = 0;
   info->clk_op = 0;
   info->clk_orth = 0;
@@ -114,11 +102,15 @@ void trl_init_info(trl_info * info, int nrow, int mxlan, int lohi,
   strcpy(info->cpfile, "");
 }
 
-void trl_g_sum(int mpicom, int nelm, double *x, double *y)
-{
+void trl_g_sum(int mpicom, int nelm, double *x, double *y) {
+  (void)mpicom;
+  (void)nelm;
+  (void)x;
+  (void)y;
 }
 
 int trl_sync_flag(int mpicom, int inflag) {
+  (void)mpicom;
   return inflag;
 }
 
@@ -126,9 +118,9 @@ void trl_g_dot(int mpicom, int nrow, double *v1, int ld1, int m1,
                double *v2, int ld2, int m2, double *rr, double *wrk) {
   char trans = 'T';
   double one = 1.0, zero = 0.0;
-  int c__1 = 1;
   int i, nd;
 
+  (void)mpicom;
   nd = m1 + m2;
   // nothing to do if both m1 and m2 are zero
   if (nd <= 0)
@@ -138,8 +130,8 @@ void trl_g_dot(int mpicom, int nrow, double *v1, int ld1, int m1,
     error("trl_g_dot: incorrect array sizes");
   }
   if (m1 > 2) {
-    trl_dgemv(&trans, nrow, m1, one, v1, ld1, rr, c__1, zero, wrk,
-              c__1);
+    trl_dgemv(&trans, nrow, m1, one, v1, ld1, rr, 1, zero, wrk,
+              1);
   } else if (m1 == 2) {
     wrk[0] = zero;
     wrk[1] = zero;
@@ -148,11 +140,11 @@ void trl_g_dot(int mpicom, int nrow, double *v1, int ld1, int m1,
       wrk[1] += v1[ld1 + i] * rr[i];
     }
   } else if (m1 == 1) {
-    wrk[0] = trl_ddot(nrow, v1, c__1, rr, c__1);
+    wrk[0] = trl_ddot(nrow, v1, 1, rr, 1);
   }
   if (m2 > 2) {
-    trl_dgemv(&trans, nrow, m2, one, v2, ld2, rr, c__1, zero, &wrk[m1],
-              c__1);
+    trl_dgemv(&trans, nrow, m2, one, v2, ld2, rr, 1, zero, &wrk[m1],
+              1);
   } else if (m2 == 2) {
     wrk[m1] = zero;
     wrk[nd - 1] = zero;
@@ -161,6 +153,6 @@ void trl_g_dot(int mpicom, int nrow, double *v1, int ld1, int m1,
       wrk[nd - 1] += v2[ld2 + i] * rr[i];
     }
   } else if (m2 == 1) {
-    wrk[m1] = trl_ddot(nrow, v2, c__1, rr, c__1);
+    wrk[m1] = trl_ddot(nrow, v2, 1, rr, 1);
   }
 }

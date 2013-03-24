@@ -381,7 +381,7 @@ int trl_read_checkpoint(char *filename, int nrow, double *evec, int lde,
    npe          (input) integer
                  On entry, specifies the number of processors.
 */
-void trl_pe_filename(int nlen, char *filename, char *base, int my_rank,
+void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
                      int npe);
 
 /*

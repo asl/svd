@@ -20,7 +20,7 @@ static void extmat_matmul(double* out,
                           const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
-  SEXP list = (SEXP)matrix, rho, rV, res;
+  SEXP rho, rV, res;
   unsigned n, m;
   PROTECT_INDEX ipx;
 
@@ -51,7 +51,7 @@ static void extmat_tmatmul(double* out,
                            const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
-  SEXP list = (SEXP)matrix, rho, rV, res;
+  SEXP rho, rV, res;
   unsigned n, m;
   PROTECT_INDEX ipx;
 
