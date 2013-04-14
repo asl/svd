@@ -849,7 +849,7 @@ trlanczos(trl_matprod op,
         beta[i] = betrot[jnd - 1] * yy[(1 + i) * jnd - 1];
       }
       /*
-      // generate eigenvectos, reclaim the space pointed by ROT
+        generate eigenvectors, reclaim the space pointed by ROT
       */
       i1 = kept * jnd + 4 * info->maxlan;
       wrk2 = &wrk[i1];
@@ -863,8 +863,8 @@ trlanczos(trl_matprod op,
                           evec, yy, kept, jml);
       }
       /*
-      // reset the counters and indices to be used by check_orth and
-      // check_recurrence
+        reset the counters and indices to be used by check_orth and
+        check_recurrence
       */
       jnd = kept;
       j1 = kept;
@@ -872,14 +872,14 @@ trlanczos(trl_matprod op,
       if (j1 < mev) {
         j1n = j1 + 1;
         j2n = 0;
-        memcpy(&evec[(j1n - 1) * lde], rr, nrow * sizeof(double));
+        memmove(&evec[(j1n - 1) * lde], rr, nrow * sizeof(double));
       } else {
         j1n = mev;
         j2n = 1;
-        memcpy(base, rr, nrow * sizeof(double));
+        memmove(base, rr, nrow * sizeof(double));
       }
       /*
-      // write checkpoint files
+        write checkpoint files
       */
       if (info->cpflag > 0) {
         write_checkpoint(info, title, nrow, alpha, beta, evec,
@@ -887,7 +887,7 @@ trlanczos(trl_matprod op,
       }
     }
     /*
-    // check the orthogonality of the basis vectors before restarting
+      check the orthogonality of the basis vectors before restarting
     */
     if (info->verbose > 6) {
       trl_check_orth(info, nrow, evec, lde, j1n, base, ldb, j2n,
@@ -937,8 +937,7 @@ end:
   vector after the smothing is applied.
 */
 
-static void smoothrr(int n, double *rr)
-{
+static void smoothrr(int n, double *rr) {
   int i;
 
   if (n <= 0)
