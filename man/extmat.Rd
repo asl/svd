@@ -3,6 +3,7 @@
 \alias{extmat.ncol}
 \alias{extmat.nrow}
 \alias{extmat}
+\alias{ematmul}
 
 \title{External matrices operations.}
 
@@ -15,15 +16,20 @@ is.extmat(X)
 extmat.ncol(X)
 extmat.nrow(X)
 extmat(mul, tmul, nrow, ncol, env = .GlobalEnv)
+ematmul(emat, v, transposed = FALSE)
 }
 
 \arguments{
-  \item{X}{matrix to operate on}
+  \item{X, emat}{matrix to operate on}
   \item{mul}{function performing the multiplication of matrix to vector}
   \item{tmul}{function performing the multiplication of transposed matrix to vector}
   \item{nrow}{number of rows of the matrix}
   \item{ncol}{number of columns of the matrix}
-  \item{env}{environment, where matrix-vector multiplication function call is evaluated in}
+  \item{env}{environment, where matrix-vector multiplication function
+    call is evaluated in}
+  \item{transposed}{logical, if 'TRUE' the multiplication is performed
+    with the transposed matrix.}
+  \item{v}{vector to multiply with.}
 }
 
 \details{
@@ -40,8 +46,8 @@ extmat(mul, tmul, nrow, ncol, env = .GlobalEnv)
 \examples{
 \dontrun{
 library(Matrix)
-f <- function(v) as.numeric(A %*% v) # Convert Matrix object back to vector
-tf <- function(v) as.numeric(tA %*% v) # Convert Matrix object back to vector
+f <- function(v) as.numeric(A \%*\% v) # Convert Matrix object back to vector
+tf <- function(v) as.numeric(tA \%*\% v) # Convert Matrix object back to vector
 
 e <- new.env()
 assign("A", USCounties, e)

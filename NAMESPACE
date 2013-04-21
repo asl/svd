@@ -5,6 +5,7 @@ export(
        is.extmat,
        extmat.ncol,
        extmat.nrow,
+       ematmul,
        extmat,
        # Propack SVD
        propack.svd,

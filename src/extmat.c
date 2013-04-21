@@ -219,6 +219,46 @@ SEXP extmat_cols(SEXP ptr) {
   return ans;
 }
 
+SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
+  SEXP Y = NILSXP, tchk;
+
+  /* Perform a type checking */
+  PROTECT(tchk = is_extmat(emat));
+
+  if (LOGICAL(tchk)[0]) {
+    R_len_t K, L;
+    ext_matrix *e;
+    rext_matrix *re;
+
+    /* Grab needed data */
+    e = R_ExternalPtrAddr(emat);
+    re = e->matrix;
+
+    L = (LOGICAL(transposed)[0] ? re->m : re->n);
+    K = (LOGICAL(transposed)[0] ? re->n : re->m);
+
+    /* Check agains absurd values of inputs */
+    if (K != length(v))
+      error("invalid length of input vector 'v'"); 
+
+    /* Allocate output buffer */
+    PROTECT(Y = allocVector(REALSXP, L));
+
+    /* Calculate the product */
+    if (LOGICAL(transposed)[0])
+      extmat_tmatmul(REAL(Y), REAL(v), re);
+    else
+      extmat_matmul(REAL(Y), REAL(v), re);
+
+    UNPROTECT(1);
+  } else
+    error("pointer provided is not an external matrix");
+
+  UNPROTECT(1);
+
+  return Y;
+}
+
 void R_init_svd(DllInfo *info) {
   (void)info;
 
