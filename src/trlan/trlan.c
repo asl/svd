@@ -102,60 +102,118 @@ void trl_clear_counter(trl_info * info, int nrow, int mev, int lde) {
 void trl_print_setup(trl_info * info, int lbas, int lmis, int lwrk)
 {
   if (info->lohi > 0) {
-    fprintf(info->log_fp,
-            "TRLAN is to compute %6d largest eigenpair(s).\n",
-            info->ned);
+    if (info->log_fp) {
+      fprintf(info->log_fp,
+              "TRLAN is to compute %6d largest eigenpair(s).\n",
+              info->ned);
+    } else {
+      Rprintf("TRLAN is to compute %6d largest eigenpair(s).\n",
+              info->ned);
+    }
   } else if (info->lohi < 0) {
-    fprintf(info->log_fp,
-            "TRLAN is to compute %6d smallest eigenpair(s).\n",
-            info->ned);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "TRLAN is to compute %6d smallest eigenpair(s).\n",
+              info->ned);
+    else
+      Rprintf("TRLAN is to compute %6d smallest eigenpair(s).\n",
+              info->ned);
   } else {
-    fprintf(info->log_fp,
-            "TRLAN is to compute %6d first converged eigenpair(s).\n",
-            info->ned);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "TRLAN is to compute %6d first converged eigenpair(s).\n",
+              info->ned);
+    else
+      Rprintf("TRLAN is to compute %6d first converged eigenpair(s).\n",
+              info->ned);
   }
-  fprintf(info->log_fp,
-          "Problem dimension: %9d (PE:%4d) %12d (Global)\n", info->nloc,
-          info->my_pe, info->ntot);
-  fprintf(info->log_fp, "Maximum basis size:                   %10d\n",
-          info->maxlan);
-  fprintf(info->log_fp, "Dynamic restarting scheme:            %10d\n",
-          info->restart);
-  fprintf(info->log_fp, "Maximum applications of the operator: %10d\n",
-          info->maxmv);
-  fprintf(info->log_fp, "Relative convergence tolerance: %10e\n",
-          info->tol);
+  if (info->log_fp) {
+    fprintf(info->log_fp,
+            "Problem dimension: %9d (PE:%4d) %12d (Global)\n", info->nloc,
+            info->my_pe, info->ntot);
+    fprintf(info->log_fp, "Maximum basis size:                   %10d\n",
+            info->maxlan);
+    fprintf(info->log_fp, "Dynamic restarting scheme:            %10d\n",
+            info->restart);
+    fprintf(info->log_fp, "Maximum applications of the operator: %10d\n",
+            info->maxmv);
+    fprintf(info->log_fp, "Relative convergence tolerance: %10e\n",
+            info->tol);
+  } else {
+    Rprintf("Problem dimension: %9d (PE:%4d) %12d (Global)\n", info->nloc,
+            info->my_pe, info->ntot);
+    Rprintf("Maximum basis size:                   %10d\n",
+            info->maxlan);
+    Rprintf("Dynamic restarting scheme:            %10d\n",
+            info->restart);
+    Rprintf("Maximum applications of the operator: %10d\n",
+            info->maxmv);
+    Rprintf("Relative convergence tolerance: %10e\n",
+            info->tol);
+  }
   /* initial guess */
   if (info->guess == 1) {
-    fprintf(info->log_fp, "User provided the starting vector.\n");
+    if (info->log_fp)
+      fprintf(info->log_fp, "User provided the starting vector.\n");
+    else
+      Rprintf("User provided the starting vector.\n");
   } else if (info->guess == 0) {
-    fprintf(info->log_fp, "TRLAN uses [1,1,...] as starting vctor.\n");
+    if (info->log_fp)
+      fprintf(info->log_fp, "TRLAN uses [1,1,...] as starting vctor.\n");
+    else
+      Rprintf("TRLAN uses [1,1,...] as starting vctor.\n");
   } else if (info->guess < 0) {
-    fprintf(info->log_fp,
-            "TRLAN generates a random starting vector.\n");
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "TRLAN generates a random starting vector.\n");
+    else
+      Rprintf("TRLAN generates a random starting vector.\n");
   } else if (info->oldcpf == 0 || strlen(info->oldcpf) == 0) {
-    fprintf(info->log_fp,
-            "Restarting with existing checkpoint files %s ####\n",
-            info->oldcpf);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "Restarting with existing checkpoint files %s ####\n",
+              info->oldcpf);
+    else
+      Rprintf("Restarting with existing checkpoint files %s ####\n",
+              info->oldcpf);
   } else {
-    fprintf(info->log_fp,
-            "Restarting with existing checkpoint files %s ####\n",
-            info->cpfile);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "Restarting with existing checkpoint files %s ####\n",
+              info->cpfile);
+    else
+      Rprintf("Restarting with existing checkpoint files %s ####\n",
+              info->cpfile);
   }
   if (info->cpflag > 0) {
-    fprintf(info->log_fp,
-            "TLRAN will write about %d sets of checkpointing files %s ####.\n",
-            info->cpflag, info->cpfile);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "TLRAN will write about %d sets of checkpointing files %s ####.\n",
+              info->cpflag, info->cpfile);
+    else
+      Rprintf("TLRAN will write about %d sets of checkpointing files %s ####.\n",
+              info->cpflag, info->cpfile);
   }
   /* print the workspace size parameters */
-  fprintf(info->log_fp, "(required) array BASE size is %d\n", lbas);
-  fprintf(info->log_fp, "(required) array MISC size is %d\n", lmis);
-  if (lwrk > 0) {
-    fprintf(info->log_fp,
-            "Caller has supplied a work array with %d elements.\n",
-            lwrk);
+  if (info->log_fp) {
+    fprintf(info->log_fp, "(required) array BASE size is %d\n", lbas);
+    fprintf(info->log_fp, "(required) array MISC size is %d\n", lmis);
+    if (lwrk > 0) {
+      fprintf(info->log_fp,
+              "Caller has supplied a work array with %d elements.\n",
+              lwrk);
+    } else {
+      fprintf(info->log_fp, "Caller did not supply work array.\n");
+    }
   } else {
-    fprintf(info->log_fp, "Caller did not supply work array.\n");
+    Rprintf("(required) array BASE size is %d\n", lbas);
+    Rprintf("(required) array MISC size is %d\n", lmis);
+    if (lwrk > 0) {
+      Rprintf("Caller has supplied a work array with %d elements.\n",
+              lwrk);
+    } else {
+      Rprintf("Caller did not supply work array.\n");
+    }
   }
 }
 
@@ -195,9 +253,13 @@ trl_ritz_projection(trl_matprod op,
     if (info->log_fp == NULL) {
       trl_reopen_logfile(info);
     }
-    fprintf(info->log_fp,
-            "TRLAN performing a separate Rayleigh-Ritz project for %d vectors.",
-            nev);
+    if (info->log_fp)
+      fprintf(info->log_fp,
+              "TRLAN performing a separate Rayleigh-Ritz project for %d vectors.",
+              nev);
+    else
+      Rprintf("TRLAN performing a separate Rayleigh-Ritz project for %d vectors.",
+              nev);
   }
   /* memory allocation -- need 3*nev*nev elements, will allocate them     */
   /* in two consecutive blocks, uau(nev*nev), rvv(2*nev*nev)              */
@@ -551,123 +613,235 @@ void trl_print_info(trl_info * info) {
   }
   trl_time_stamp(info->log_fp);
   /* printf("printing\n"); */
-  if (info->npes > 1) {
-    fprintf(info->log_fp,
-            "TRLAN execution summary (exit status = %d) on PE %d\n",
-            info->stat, info->my_pe);
-  } else {
-    fprintf(info->log_fp,
-            "TRLAN execution summary (exit status =%d)\n", info->stat);
-  }
-  if (info->lohi > 0) {
-    fprintf(info->log_fp,
-            "Number of LARGEST eigenpairs      %10d (computed) %11d (wanted)\n",
-            info->nec, info->ned);
-  } else if (info->lohi < 0) {
-    fprintf(info->log_fp,
-            "Number of SMALLEST eigenpairs    %10d (computed) %11d (wanted)\n",
-            info->nec, info->ned);
-  } else {
-    fprintf(info->log_fp,
-            "Number of EXTREME eigenpairs     %10d (computed) %11d (wanted)\n",
-            info->nec, info->ned);
-  }
-  fprintf(info->log_fp,
-          "Times the operator is applied:   %10d (MAX: %16d )\n",
-          info->matvec, info->maxmv);
-  fprintf(info->log_fp,
-          "Problem size:                    %10d (PE: %4d) %11d (Global)\n",
-          info->nloc, info->my_pe, info->ntot);
-  fprintf(info->log_fp,
-          "Convergence tolerance:           %10.3e (rel) %16.3e (abs)\n",
-          info->tol, info->tol * info->anrm);
-  fprintf(info->log_fp, "Maximum basis size:              %10d\n",
-          info->maxlan);
-  fprintf(info->log_fp, "Restarting scheme:               %10d\n",
-          info->restart);
-  fprintf(info->log_fp, "Number of re-orthogonalizations: %10d\n",
-          info->north);
-  fprintf(info->log_fp, "Number of (re)start loops:       %10d\n",
-          info->nloop);
-  if (info->nrand > 0) {
-    fprintf(info->log_fp, "Number of random vectors used:   %10d\n",
-            info->nrand);
-  }
-  if (info->npes > 1) {
-    fprintf(info->log_fp, "Number of MPI processes:         %10d\n",
-            info->npes);
-  }
-  fprintf(info->log_fp, "Number of eigenpairs locked:     %10d\n",
-          info->locked);
-  fprintf(info->log_fp, "time in OP:            %12.4e sec\n", t_op);
-  fprintf(info->log_fp, "time in orth:          %12.4e sec\n", t_orth);
-  fprintf(info->log_fp, "time in restarting:    %12.4e sec\n", t_res);
-  fprintf(info->log_fp, "total time in TRLAN:   %12.4e sec\n", t_tot);
-
-  /*
-    if (info->verbose > 0 && info->log_fp != info->log_fp) {
-    fprintf( info->log_fp, "Debug infomation written to files %s ####\n",info->log_file );
-    }
-  */
-  if (info->guess > 1 && info->wrds_in > 0) {
-    if (strlen(info->oldcpf) <= 0) {
+  if (info->log_fp) {
+    if (info->npes > 1) {
       fprintf(info->log_fp,
-              "TRLAN restarted with checkpoint files %s ####\n",
-              info->oldcpf);
+              "TRLAN execution summary (exit status = %d) on PE %d\n",
+              info->stat, info->my_pe);
     } else {
       fprintf(info->log_fp,
-              "TRLAN restarted with checkpoint files %s ####\n",
-              info->cpfile);
+              "TRLAN execution summary (exit status =%d)\n", info->stat);
+    }
+    if (info->lohi > 0) {
+      fprintf(info->log_fp,
+              "Number of LARGEST eigenpairs      %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
+    } else if (info->lohi < 0) {
+      fprintf(info->log_fp,
+              "Number of SMALLEST eigenpairs    %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
+    } else {
+      fprintf(info->log_fp,
+              "Number of EXTREME eigenpairs     %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
     }
     fprintf(info->log_fp,
-            "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
-            r_in, t_in, r_in / t_in);
-  }
-  if (info->clk_out > 0 && info->wrds_out > 0) {
-    fprintf(info->log_fp, "Checkpoint files are %s ####\n",
-            info->cpfile);
+            "Times the operator is applied:   %10d (MAX: %16d )\n",
+            info->matvec, info->maxmv);
     fprintf(info->log_fp,
-            "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
-            r_out, t_out, r_out / t_out);
-  }
-  if (info->npes > 1) {
-    /* write global performance information */
-    rinv = 1.0 / info->npes;
-    for (i = 0; i < 12; i++) {
-      tmp1[i] = tmp1[i] * rinv;
+            "Problem size:                    %10d (PE: %4d) %11d (Global)\n",
+            info->nloc, info->my_pe, info->ntot);
+    fprintf(info->log_fp,
+            "Convergence tolerance:           %10.3e (rel) %16.3e (abs)\n",
+            info->tol, info->tol * info->anrm);
+    fprintf(info->log_fp, "Maximum basis size:              %10d\n",
+            info->maxlan);
+    fprintf(info->log_fp, "Restarting scheme:               %10d\n",
+            info->restart);
+    fprintf(info->log_fp, "Number of re-orthogonalizations: %10d\n",
+            info->north);
+    fprintf(info->log_fp, "Number of (re)start loops:       %10d\n",
+            info->nloop);
+    if (info->nrand > 0) {
+      fprintf(info->log_fp, "Number of random vectors used:   %10d\n",
+              info->nrand);
     }
-    for (i = 0; i < 6; i++) {
-      if (tmp1[i] > 0) {
-        tmp1[i + 6] = tmp1[i + 6] / tmp1[i];
+    if (info->npes > 1) {
+      fprintf(info->log_fp, "Number of MPI processes:         %10d\n",
+              info->npes);
+    }
+    fprintf(info->log_fp, "Number of eigenpairs locked:     %10d\n",
+            info->locked);
+    fprintf(info->log_fp, "time in OP:            %12.4e sec\n", t_op);
+    fprintf(info->log_fp, "time in orth:          %12.4e sec\n", t_orth);
+    fprintf(info->log_fp, "time in restarting:    %12.4e sec\n", t_res);
+    fprintf(info->log_fp, "total time in TRLAN:   %12.4e sec\n", t_tot);
+
+    if (info->guess > 1 && info->wrds_in > 0) {
+      if (strlen(info->oldcpf) <= 0) {
+        fprintf(info->log_fp,
+                "TRLAN restarted with checkpoint files %s ####\n",
+                info->oldcpf);
       } else {
-        tmp1[i + 6] = 0.0;
+        fprintf(info->log_fp,
+                "TRLAN restarted with checkpoint files %s ####\n",
+                info->cpfile);
+      }
+      fprintf(info->log_fp,
+              "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
+              r_in, t_in, r_in / t_in);
+    }
+    if (info->clk_out > 0 && info->wrds_out > 0) {
+      fprintf(info->log_fp, "Checkpoint files are %s ####\n",
+              info->cpfile);
+      fprintf(info->log_fp,
+              "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
+              r_out, t_out, r_out / t_out);
+    }
+    if (info->npes > 1) {
+      /* write global performance information */
+      rinv = 1.0 / info->npes;
+      for (i = 0; i < 12; i++) {
+        tmp1[i] = tmp1[i] * rinv;
+      }
+      for (i = 0; i < 6; i++) {
+        if (tmp1[i] > 0) {
+          tmp1[i + 6] = tmp1[i + 6] / tmp1[i];
+        } else {
+          tmp1[i + 6] = 0.0;
+        }
+      }
+      if (tmp1[4] == tmp1[5] && tmp1[4] == 0) {
+        fprintf(info->log_fp,
+                " -- Global summary -- \n" );
+        fprintf(info->log_fp,
+                "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\n");
+        fprintf(info->log_fp,
+                "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[0], tmp1[1], tmp1[2], tmp1[3]);
+        fprintf(info->log_fp,
+                "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[6], tmp1[7], tmp1[8], tmp1[9]);
+      } else {
+        fprintf(info->log_fp,
+                " -- Global summary -- \n" );
+        fprintf(info->log_fp,
+                "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\t  Read,\t  Write\n");
+        fprintf(info->log_fp,
+                "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[0], tmp1[1], tmp1[2], tmp1[3], tmp1[4], tmp1[5]);
+        fprintf(info->log_fp,
+                "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[6], tmp1[7], tmp1[8], tmp1[9], tmp1[10],
+                tmp1[11]);
       }
     }
-    if (tmp1[4] == tmp1[5] && tmp1[4] == 0) {
-      fprintf(info->log_fp,
-              " -- Global summary -- \n" );
-      fprintf(info->log_fp,
-              "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\n");
-      fprintf(info->log_fp,
-              "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
-              tmp1[0], tmp1[1], tmp1[2], tmp1[3]);
-      fprintf(info->log_fp,
-              "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
-              tmp1[6], tmp1[7], tmp1[8], tmp1[9]);
+  } else {
+    if (info->npes > 1) {
+      Rprintf(
+              "TRLAN execution summary (exit status = %d) on PE %d\n",
+              info->stat, info->my_pe);
     } else {
-      fprintf(info->log_fp,
-              " -- Global summary -- \n" );
-      fprintf(info->log_fp,
-              "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\t  Read,\t  Write\n");
-      fprintf(info->log_fp,
-              "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
-              tmp1[0], tmp1[1], tmp1[2], tmp1[3], tmp1[4], tmp1[5]);
-      fprintf(info->log_fp,
-              "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
-              tmp1[6], tmp1[7], tmp1[8], tmp1[9], tmp1[10],
-              tmp1[11]);
+      Rprintf(
+              "TRLAN execution summary (exit status =%d)\n", info->stat);
+    }
+    if (info->lohi > 0) {
+      Rprintf(
+              "Number of LARGEST eigenpairs      %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
+    } else if (info->lohi < 0) {
+      Rprintf(
+              "Number of SMALLEST eigenpairs    %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
+    } else {
+      Rprintf(
+              "Number of EXTREME eigenpairs     %10d (computed) %11d (wanted)\n",
+              info->nec, info->ned);
+    }
+    Rprintf(
+            "Times the operator is applied:   %10d (MAX: %16d )\n",
+            info->matvec, info->maxmv);
+    Rprintf(
+            "Problem size:                    %10d (PE: %4d) %11d (Global)\n",
+            info->nloc, info->my_pe, info->ntot);
+    Rprintf(
+            "Convergence tolerance:           %10.3e (rel) %16.3e (abs)\n",
+            info->tol, info->tol * info->anrm);
+    Rprintf("Maximum basis size:              %10d\n",
+            info->maxlan);
+    Rprintf("Restarting scheme:               %10d\n",
+            info->restart);
+    Rprintf("Number of re-orthogonalizations: %10d\n",
+            info->north);
+    Rprintf("Number of (re)start loops:       %10d\n",
+            info->nloop);
+    if (info->nrand > 0) {
+      Rprintf("Number of random vectors used:   %10d\n",
+              info->nrand);
+    }
+    if (info->npes > 1) {
+      Rprintf("Number of MPI processes:         %10d\n",
+              info->npes);
+    }
+    Rprintf("Number of eigenpairs locked:     %10d\n",
+            info->locked);
+    Rprintf("time in OP:            %12.4e sec\n", t_op);
+    Rprintf("time in orth:          %12.4e sec\n", t_orth);
+    Rprintf("time in restarting:    %12.4e sec\n", t_res);
+    Rprintf("total time in TRLAN:   %12.4e sec\n", t_tot);
+
+    if (info->guess > 1 && info->wrds_in > 0) {
+      if (strlen(info->oldcpf) <= 0) {
+        Rprintf(
+                "TRLAN restarted with checkpoint files %s ####\n",
+                info->oldcpf);
+      } else {
+        Rprintf(
+                "TRLAN restarted with checkpoint files %s ####\n",
+                info->cpfile);
+      }
+      Rprintf(
+              "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
+              r_in, t_in, r_in / t_in);
+    }
+    if (info->clk_out > 0 && info->wrds_out > 0) {
+      Rprintf("Checkpoint files are %s ####\n",
+              info->cpfile);
+      Rprintf(
+              "Bytes read   %12.5e, Time(sec): %12.5e, Rate(B/s): %12.5e\n",
+              r_out, t_out, r_out / t_out);
+    }
+    if (info->npes > 1) {
+      /* write global performance information */
+      rinv = 1.0 / info->npes;
+      for (i = 0; i < 12; i++) {
+        tmp1[i] = tmp1[i] * rinv;
+      }
+      for (i = 0; i < 6; i++) {
+        if (tmp1[i] > 0) {
+          tmp1[i + 6] = tmp1[i + 6] / tmp1[i];
+        } else {
+          tmp1[i + 6] = 0.0;
+        }
+      }
+      if (tmp1[4] == tmp1[5] && tmp1[4] == 0) {
+        Rprintf(
+                " -- Global summary -- \n" );
+        Rprintf(
+                "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\n");
+        Rprintf(
+                "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[0], tmp1[1], tmp1[2], tmp1[3]);
+        Rprintf(
+                "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[6], tmp1[7], tmp1[8], tmp1[9]);
+      } else {
+        Rprintf(
+                " -- Global summary -- \n" );
+        Rprintf(
+                "                       Overall,\t\t  MATVEC,\t  Re-orth,\t  Restart,\t  Read,\t  Write\n");
+        Rprintf(
+                "Time(ave)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[0], tmp1[1], tmp1[2], tmp1[3], tmp1[4], tmp1[5]);
+        Rprintf(
+                "Rate(tot)             %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e,\t %11.4e\n",
+                tmp1[6], tmp1[7], tmp1[8], tmp1[9], tmp1[10],
+                tmp1[11]);
+      }
     }
   }
+
+
   trl_close_logfile(info);
   return;
 }
@@ -677,11 +851,7 @@ void trl_terse_info(trl_info * info, FILE * iou) {
   double t_tot, t_op, t_orth, t_res;
 
   if (iou == NULL) {
-    if (info->log_fp == NULL) {
-      iou = stdout;
-    } else {
-      iou = info->log_fp;
-    }
+    iou = info->log_fp;
   }
   if (info->clk_rate > 0) {
     t_op = info->tick_o + info->clk_op / (double) (info->clk_rate);
@@ -696,31 +866,54 @@ void trl_terse_info(trl_info * info, FILE * iou) {
     t_res = info->tick_r + info->clk_res / (double) (rate);
     t_orth = info->tick_h + info->clk_orth / (double) (rate);
   }
-  if (info->lohi > 0) {
+  if (iou) {
+    if (info->lohi > 0) {
+      fprintf(iou,
+              "MAXLAN:%10d, Restart:%10d,   NED: + %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    } else if (info->lohi < 0) {
+      fprintf(iou,
+              "MAXLAN:%10d, Restart:%10d,   NED: - %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    } else {
+      fprintf(iou,
+              "MAXLAN:%10d, Restart:%10d,   NED: 0 %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    }
     fprintf(iou,
-            "MAXLAN:%10d, Restart:%10d,   NED: + %7d,      NEC:%10d\n",
-            info->maxlan, info->restart, info->ned, info->nec);
-  } else if (info->lohi < 0) {
-    fprintf(iou,
-            "MAXLAN:%10d, Restart:%10d,   NED: - %7d,      NEC:%10d\n",
-            info->maxlan, info->restart, info->ned, info->nec);
+            "MATVEC:%10d,  Reorth:%10d, Nloop:   %7d,  Nlocked:%10d\n",
+            info->matvec, info->north, info->nloop, info->locked);
+    if (t_tot > 0.001 && fmax2(t_tot, fmax2(t_op, fmax2(t_res, t_orth))) < 1000) {
+      fprintf(iou,
+              "Ttotal:%10.6f,    T_op:%10.6f, Torth:%10.6f,   Tstart:%10.6f\n",
+              t_tot, t_op, t_orth, t_res);
+    } else {
+      fprintf(iou,
+              "Ttotal:%10.3e,    T_op:%10.3e, Torth:%10.3e,   Tstart:%10.3e\n",
+              t_tot, t_op, t_orth, t_res);
+    }
   } else {
-    fprintf(iou,
-            "MAXLAN:%10d, Restart:%10d,   NED: 0 %7d,      NEC:%10d\n",
-            info->maxlan, info->restart, info->ned, info->nec);
+    if (info->lohi > 0) {
+      Rprintf("MAXLAN:%10d, Restart:%10d,   NED: + %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    } else if (info->lohi < 0) {
+      Rprintf("MAXLAN:%10d, Restart:%10d,   NED: - %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    } else {
+      Rprintf("MAXLAN:%10d, Restart:%10d,   NED: 0 %7d,      NEC:%10d\n",
+              info->maxlan, info->restart, info->ned, info->nec);
+    }
+    Rprintf("MATVEC:%10d,  Reorth:%10d, Nloop:   %7d,  Nlocked:%10d\n",
+            info->matvec, info->north, info->nloop, info->locked);
+    if (t_tot > 0.001 && fmax2(t_tot, fmax2(t_op, fmax2(t_res, t_orth))) < 1000) {
+      Rprintf("Ttotal:%10.6f,    T_op:%10.6f, Torth:%10.6f,   Tstart:%10.6f\n",
+              t_tot, t_op, t_orth, t_res);
+    } else {
+      Rprintf("Ttotal:%10.3e,    T_op:%10.3e, Torth:%10.3e,   Tstart:%10.3e\n",
+              t_tot, t_op, t_orth, t_res);
+    }
   }
-  fprintf(iou,
-          "MATVEC:%10d,  Reorth:%10d, Nloop:   %7d,  Nlocked:%10d\n",
-          info->matvec, info->north, info->nloop, info->locked);
-  if (t_tot > 0.001 && fmax2(t_tot, fmax2(t_op, fmax2(t_res, t_orth))) < 1000) {
-    fprintf(iou,
-            "Ttotal:%10.6f,    T_op:%10.6f, Torth:%10.6f,   Tstart:%10.6f\n",
-            t_tot, t_op, t_orth, t_res);
-  } else {
-    fprintf(iou,
-            "Ttotal:%10.3e,    T_op:%10.3e, Torth:%10.3e,   Tstart:%10.3e\n",
-            t_tot, t_op, t_orth, t_res);
-  }
+
 }
 
 void
@@ -821,18 +1014,16 @@ trl_check_ritz(trl_matprod op,
   if (info->log_fp == NULL)
     trl_reopen_logfile(info);
 
-  if (info->log_fp != stdout || info->my_pe <= 0) {
+  if (info->my_pe <= 0) {
     if (info->stat != 0) {
       *check = -4;
     }
     /* print out the information */
-    fprintf(info->log_fp, "TRL_CHECK_RITZ: \n");
-    fprintf(info->log_fp,
-            "           Ritz value       res norm   res diff  est error  diff w rq  act. error\n");
+    Rprintf("TRL_CHECK_RITZ: \n");
+    Rprintf("           Ritz value       res norm   res diff  est error  diff w rq  act. error\n");
     if (beta != NULL && eval != NULL) {
       for (i = 0; i < ncol; i++) {
-        fprintf(info->log_fp,
-                "%21.14f    %11.3e%11.3e%11.3e%11.3e %11.3e%11.3e\n",
+        Rprintf("%21.14f    %11.3e%11.3e%11.3e%11.3e %11.3e%11.3e\n",
                 alpha[i], res[i], beta[i] - res[i], err[i],
                 rq[i] - alpha[i], eval[i] - alpha[i], eval[i]);
         /* check the accuracy of results.. */
@@ -853,7 +1044,7 @@ trl_check_ritz(trl_matprod op,
 
     } else if (beta != NULL) {
       for (i = 0; i < ncol; i++) {
-        fprintf(info->log_fp, "%21.14f    %11.3e%11.3e%11.3e%11.3e\n",
+        Rprintf("%21.14f    %11.3e%11.3e%11.3e%11.3e\n",
                 alpha[i], res[i], beta[i] - res[i], err[i],
                 rq[i] - alpha[i]);
 
@@ -868,14 +1059,13 @@ trl_check_ritz(trl_matprod op,
       }
     } else if (eval != NULL) {
       for (i = 0; i < ncol; i++) {
-        fprintf(info->log_fp,
-                "%21.14f     %11.3e           %11.3e%11.3e%11.3e%11.3e\n",
+        Rprintf("%21.14f     %11.3e           %11.3e%11.3e%11.3e%11.3e\n",
                 alpha[i], res[i], err[i], rq[i] - alpha[i],
                 eval[i] - alpha[i], eval[i]);
       }
     } else {
       for (i = 0; i < ncol; i++) {
-        fprintf(info->log_fp, "%21.14f    %11.5e           %11.3e%11.3e\n",
+        Rprintf("%21.14f    %11.5e           %11.3e%11.3e\n",
                 alpha[i], res[i], err[i], rq[i] - alpha[i]);
       }
     }
@@ -919,9 +1109,13 @@ trl_rayleigh_quotients(trl_matprod op,
       trl_reopen_logfile(info);
     }
     fp = info->log_fp;
-    fprintf(fp,
-            "TRLAN computing Rayleigh Quotients for %d Ritz pairs\n",
-            ncol);
+    if (fp)
+      fprintf(fp,
+              "TRLAN computing Rayleigh Quotients for %d Ritz pairs\n",
+              ncol);
+    else
+      Rprintf("TRLAN computing Rayleigh Quotients for %d Ritz pairs\n",
+              ncol);
   }
   /* loop through each vector to normalize the vector, compute Rayleigh  */
   /* quotient and compute residual norm of the new Ritz pairs            */

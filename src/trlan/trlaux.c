@@ -30,7 +30,7 @@ void trl_open_logfile(trl_info * info) {
                     info->npes);
     info->log_fp = fopen(filename, "w");
   } else {
-    info->log_fp = stdout;
+    info->log_fp = NULL;
   }
 }
 
@@ -43,13 +43,13 @@ void trl_reopen_logfile(trl_info * info)
                      info->npes);
     info->log_fp = fopen(filename, "a");
   } else {
-    info->log_fp = stdout;
+    info->log_fp = NULL;
   }
 }
 
 void trl_close_logfile(trl_info * info)
 {
-  if (info->log_fp != NULL && info->log_fp != stdout) {
+  if (info->log_fp != NULL) {
     fclose(info->log_fp);
   }
   info->log_fp = NULL;
@@ -64,13 +64,13 @@ void trl_open_cptfile(trl_info * info)
                     info->npes);
     info->cpt_fp = fopen(filename, "w");
   } else {
-    info->cpt_fp = stdout;
+    info->cpt_fp = NULL;
   }
 }
 
 void trl_close_cptfile(trl_info * info)
 {
-  if (info->cpt_fp != stdout) {
+  if (info->cpt_fp != NULL) {
     fclose(info->cpt_fp);
   }
   info->cpt_fp = NULL;
@@ -81,17 +81,31 @@ void trl_print_int(trl_info * info, char *title, int size_array,
 {
   int i;
 
-  fprintf(info->log_fp, "PE %d : %s", info->my_pe, title);
-  if (size_array > 2) {
-    fprintf(info->log_fp, "\n");
-  }
-  for (i = 0; i < size_array; i += inc) {
-    fprintf(info->log_fp, "%10d", array[i]);
-    if ((i % 8) == 7)
+  if (info->log_fp) {
+    fprintf(info->log_fp, "PE %d : %s", info->my_pe, title);
+    if (size_array > 2) {
       fprintf(info->log_fp, "\n");
+    }
+    for (i = 0; i < size_array; i += inc) {
+      fprintf(info->log_fp, "%10d", array[i]);
+      if ((i % 8) == 7)
+        fprintf(info->log_fp, "\n");
+    }
+    if (((size_array - 1) % 8) != 7)
+      fprintf(info->log_fp, "\n");
+  } else {
+    Rprintf("PE %d : %s", info->my_pe, title);
+    if (size_array > 2) {
+      Rprintf("\n");
+    }
+    for (i = 0; i < size_array; i += inc) {
+      Rprintf("%10d", array[i]);
+      if ((i % 8) == 7)
+        Rprintf("\n");
+    }
+    if (((size_array - 1) % 8) != 7)
+      Rprintf("\n");
   }
-  if (((size_array - 1) % 8) != 7)
-    fprintf(info->log_fp, "\n");
 }
 
 void trl_print_real(trl_info * info, char *title, int size_array,
@@ -99,28 +113,51 @@ void trl_print_real(trl_info * info, char *title, int size_array,
 {
   int i;
 
-  fprintf(info->log_fp, "PE %d : %s", info->my_pe, title);
-  if (size_array > 1) {
-    fprintf(info->log_fp, "\n");
-  }
-  for (i = 0; i < size_array; i += inc) {
-    fprintf(info->log_fp, " %10.7e", array[i]);
-    if ((i % 8) == 7)
+  if (info->log_fp) {
+    fprintf(info->log_fp, "PE %d : %s", info->my_pe, title);
+    if (size_array > 1) {
       fprintf(info->log_fp, "\n");
+    }
+    for (i = 0; i < size_array; i += inc) {
+      fprintf(info->log_fp, " %10.7e", array[i]);
+      if ((i % 8) == 7)
+        fprintf(info->log_fp, "\n");
+    }
+    if (((size_array - 1) % 8) != 7)
+      fprintf(info->log_fp, "\n");
+  } else {
+    Rprintf("PE %d : %s", info->my_pe, title);
+    if (size_array > 1) {
+      Rprintf("\n");
+    }
+    for (i = 0; i < size_array; i += inc) {
+      Rprintf(" %10.7e", array[i]);
+      if ((i % 8) == 7)
+        Rprintf("\n");
+    }
+    if (((size_array - 1) % 8) != 7)
+      Rprintf("\n");
   }
-  if (((size_array - 1) % 8) != 7)
-    fprintf(info->log_fp, "\n");
 }
 
 void trl_print_progress(trl_info * info)
 {
-  fprintf(info->log_fp, "MATVEC: %10d,    Nloop: %10d,     Nec: %10d\n",
-          info->matvec, info->nloop, info->nec);
-  fprintf(info->log_fp, "Reorth: %10d,    Nrand: %10d,    Ierr: %10d\n",
-          info->north, info->nrand, info->stat);
-  fprintf(info->log_fp,
-          "Target: %10.3e,   ResNrm: %10.3e,    CFact: %10.3e\n",
-          info->trgt, info->tres, info->crat);
+  if (info->log_fp) {
+    fprintf(info->log_fp, "MATVEC: %10d,    Nloop: %10d,     Nec: %10d\n",
+            info->matvec, info->nloop, info->nec);
+    fprintf(info->log_fp, "Reorth: %10d,    Nrand: %10d,    Ierr: %10d\n",
+            info->north, info->nrand, info->stat);
+    fprintf(info->log_fp,
+            "Target: %10.3e,   ResNrm: %10.3e,    CFact: %10.3e\n",
+            info->trgt, info->tres, info->crat);
+  } else {
+    Rprintf("MATVEC: %10d,    Nloop: %10d,     Nec: %10d\n",
+            info->matvec, info->nloop, info->nec);
+    Rprintf("Reorth: %10d,    Nrand: %10d,    Ierr: %10d\n",
+            info->north, info->nrand, info->stat);
+    Rprintf("Target: %10.3e,   ResNrm: %10.3e,    CFact: %10.3e\n",
+            info->trgt, info->tres, info->crat);
+  }
 }
 
 void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
@@ -141,24 +178,42 @@ void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
   if (lwrk < (jnd + jnd))
     error("TRL_CHECK_ORTH: workspace too small.\n");
 
-  fprintf(info->log_fp,
-          "TRL_CHECK_ORTH: check orthogonality of %d basis vectors.\n",
-          jnd);
+  if (info->log_fp)
+    fprintf(info->log_fp,
+            "TRL_CHECK_ORTH: check orthogonality of %d basis vectors.\n",
+            jnd);
+  else
+    Rprintf("TRL_CHECK_ORTH: check orthogonality of %d basis vectors.\n",
+            jnd);
+
   /* check orthognality of the basis vectors */
   for (i = 0; i < j1; i++) {
     trl_g_dot(info->mpicom, nrow, v1, ld1, i + 1, v2, ld2, 0,
               &v1[i * nrow], wrk);
     wrk[i] = wrk[i] - one;
     if (info->verbose > 7) {
-      fprintf(info->log_fp, "Orthogonality level of v(%d) ..\n",
-              i + 1);
-      for (j = 0; j <= i; j++) {
-        fprintf(info->log_fp, " %10.3e", wrk[j]);
-        if ((j % 8) == 7)
+      if (info->log_fp) {
+        fprintf(info->log_fp, "Orthogonality level of v(%d) ..\n",
+                i + 1);
+        for (j = 0; j <= i; j++) {
+          fprintf(info->log_fp, " %10.3e", wrk[j]);
+          if ((j % 8) == 7)
+            fprintf(info->log_fp, "\n");
+        }
+        if ((i % 8) != 7)
           fprintf(info->log_fp, "\n");
+      } else {
+        Rprintf("Orthogonality level of v(%d) ..\n",
+                i + 1);
+        for (j = 0; j <= i; j++) {
+          Rprintf(" %10.3e", wrk[j]);
+          if ((j % 8) == 7)
+            Rprintf("\n");
+        }
+        if ((i % 8) != 7)
+          Rprintf("\n");
       }
-      if ((i % 8) != 7)
-        fprintf(info->log_fp, "\n");
+
     }
     nrmfro =
       nrmfro + 2 * trl_ddot(i, wrk, 1, wrk,
@@ -176,27 +231,47 @@ void trl_check_orth(trl_info * info, int nrow, double *v1, int ld1,
               &v2[i * nrow], wrk);
     wrk[j] = wrk[j] - one;
     if (info->verbose > 7) {
-      fprintf(info->log_fp, "Orthogonality level of v(%d) ..\n",
-              j + 1);
-      for (k = 0; k <= j; k++) {
-        fprintf(info->log_fp, " %10.3e", wrk[k]);
-        if ((k % 8) == 7)
+      if (info->log_fp) {
+        fprintf(info->log_fp, "Orthogonality level of v(%d) ..\n",
+                j + 1);
+        for (k = 0; k <= j; k++) {
+          fprintf(info->log_fp, " %10.3e", wrk[k]);
+          if ((k % 8) == 7)
+            fprintf(info->log_fp, "\n");
+        }
+        if ((j % 8) != 7)
           fprintf(info->log_fp, "\n");
+      } else {
+        Rprintf("Orthogonality level of v(%d) ..\n",
+                j + 1);
+        for (k = 0; k <= j; k++) {
+          Rprintf(" %10.3e", wrk[k]);
+          if ((k % 8) == 7)
+            Rprintf("\n");
+        }
+        if ((j % 8) != 7)
+          Rprintf("\n");
       }
-      if ((j % 8) != 7)
-        fprintf(info->log_fp, "\n");
+
     }
     nrmfro =
       nrmfro + 2 * trl_ddot(j, wrk, 1, wrk,
                             1) + wrk[j] * wrk[j];
     nrminf = fmax2(nrminf, fabs(wrk[j]));
   }
-  fprintf(info->log_fp,
-          "Frobenius norm of orthogonality level %10i %4i  %14.5e\n",
-          info->matvec, jnd, sqrt(nrmfro));
-  fprintf(info->log_fp,
-          "Maximum abs. value of orthogonality level is  %14.5e\n",
-          nrminf);
+  if (info->log_fp) {
+    fprintf(info->log_fp,
+            "Frobenius norm of orthogonality level %10i %4i  %14.5e\n",
+            info->matvec, jnd, sqrt(nrmfro));
+    fprintf(info->log_fp,
+            "Maximum abs. value of orthogonality level is  %14.5e\n",
+            nrminf);
+  } else {
+    Rprintf("Frobenius norm of orthogonality level %10i %4i  %14.5e\n",
+            info->matvec, jnd, sqrt(nrmfro));
+    Rprintf("Maximum abs. value of orthogonality level is  %14.5e\n",
+            nrminf);
+  }
 }
 
 void
@@ -214,7 +289,7 @@ trl_check_recurrence(trl_matprod op,
   double *aq = NULL, *qkp1, *cs, *alf, *bet;
 
   (void)ld1; (void)ld2;
-  
+
   mv1 = m1;
   if (m2 > 0) {
     j2 = m2 - 1;
@@ -593,6 +668,11 @@ void trl_time_stamp(FILE * fp) {
   time_t clck;
 
   clck = time(NULL);
-  fprintf(fp, "                                                  %s",
-          asctime(localtime(&clck)));
+  if (fp) {
+    fprintf(fp, "                                                  %s",
+            asctime(localtime(&clck)));
+  } else {
+    Rprintf("                                                  %s",
+            asctime(localtime(&clck)));
+  }
 }

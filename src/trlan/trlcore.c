@@ -172,9 +172,15 @@ void log_error_state(trl_info * info, int kept, int j1, int j2, int jnd,
   iwrk[0] = info->stat;
   trl_print_int(info, title, 1, iwrk, 1);
   trl_terse_info(info, fp);
-  fprintf(fp, "This Lanczos iteration started with %d vectors.\n", kept);
-  fprintf(fp, "There are %d (%d, %d) Lanczos vectors currently.\n", jnd,
-          j1, j2);
+  if (fp) {
+    fprintf(fp, "This Lanczos iteration started with %d vectors.\n", kept);
+    fprintf(fp, "There are %d (%d, %d) Lanczos vectors currently.\n", jnd,
+            j1, j2);
+  } else {
+    Rprintf("This Lanczos iteration started with %d vectors.\n", kept);
+    Rprintf("There are %d (%d, %d) Lanczos vectors currently.\n", jnd,
+            j1, j2);
+  }
   if (jnd != j1 + j2)
     jnd = j1 + j2;
   if (jnd < 0 || jnd > info->klan)
@@ -215,7 +221,7 @@ void log_error_state(trl_info * info, int kept, int j1, int j2, int jnd,
     sprintf(title, "Content of rr (residual == q_%d) ..", jnd + 1);
     trl_print_real(info, title, nrow, rr, 1);
   }
-  if (info->my_pe == 0 && info->log_fp != stdout) {
+  if (info->my_pe == 0 && info->log_fp != NULL) {
     warning("TRLanczos returned with error\n""Contents of most variables are dumped to log file %s.\n",
             info->log_file);
   }
@@ -1934,6 +1940,6 @@ int trl_check_dgen(trl_info * info, int jnd, double *lambda,
   (void)lambda;
   (void)res;
 #endif
-  
+
   return -1;
 }
