@@ -112,7 +112,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character*1 which,jobu,jobv
+      character which(*),jobu(*),jobv(*)
       integer m,n,p,neig,maxiter,ldu,ldv,iter,liwork
       integer iwork(liwork),lwork,info,ioption(*)
       double precision U(ldu,*),V(ldv,*),Sigma(*),bnd(*),work(lwork)
@@ -1336,7 +1336,7 @@ c If jobq=='Y' then on return Qt contains Q^T.
 c     %------------%
 c     | Parameters |
 c     %------------%
-      character*1 jobq
+      character jobq(*)
       logical ignorelast
       integer n,ldq
       double precision D(*),E(*),c1,c2,Qt(ldq,*)
@@ -1946,7 +1946,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character*1 which, jobu,jobv
+      character which(*), jobu(*),jobv(*)
       integer m,n,k,dim,ldu,ldv,in_lwrk,iwork(*)
       double precision U(ldu,*),V(ldv,*),D(*),E(*),S(*),work(*)
 
