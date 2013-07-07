@@ -35,22 +35,21 @@ typedef void (*propack_mulfn) (char *transa,
                                double *x, double *y,
                                double *dparm, int *iparm);
 
-void F77_NAME(dlansvd_irl) (char *which, char *jobu, char *jobv,
-                            int *m, int *n,
-                            int *dim, int *p,
-                            int *neig,
-                            int *maxiter,
-                            propack_mulfn aprod,
-                            double *u, int *ldu,
-                            double *sigma,
-                            double *bnd,
-                            double *v, int *ldv,
-                            double *tolin,
-                            double *work, int *lwork,
-                            int *iwork, int *liwork,
-                            double *doption, int *ioption,
-                            int *info,
-                            double *dparm, int *iparm);
+void F77_NAME(dlansvd_irl_largest) (int *m, int *n,
+                                    int *dim, int *p,
+                                    int *neig,
+                                    int *maxiter,
+                                    propack_mulfn aprod,
+                                    double *u, int *ldu,
+                                    double *sigma,
+                                    double *bnd,
+                                    double *v, int *ldv,
+                                    double *tolin,
+                                    double *work, int *lwork,
+                                    int *iwork, int *liwork,
+                                    double *doption, int *ioption,
+                                    int *info,
+                                    double *dparm, int *iparm);
 
 
 void F77_SUB(printint0)(char* label, int* nc, int* d) {
@@ -219,19 +218,18 @@ SEXP propack_svd(SEXP A, SEXP ne, SEXP opts) {
 
   oneig = neig;
   F77_CALL(clearstat)();
-  F77_CALL(dlansvd_irl)("L", "Y", "Y",
-                        &m, &n,
-                        &dim, &p, &neig, &maxiter,
-                        mulfn,
-                        wU, &m,
-                        sigma, bnd,
-                        wV, &n,
-                        &tol,
-                        work, &lwrk,
-                        iwork, &liwrk,
-                        doption, ioption,
-                        &info,
-                        dparm, iparm);
+  F77_CALL(dlansvd_irl_largest)(&m, &n,
+                                &dim, &p, &neig, &maxiter,
+                                mulfn,
+                                wU, &m,
+                                sigma, bnd,
+                                wV, &n,
+                                &tol,
+                                work, &lwrk,
+                                iwork, &liwrk,
+                                doption, ioption,
+                                &info,
+                                dparm, iparm);
 
   /* Cleanup */
   Free(work); Free(iwork); Free(bnd);

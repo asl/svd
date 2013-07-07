@@ -112,7 +112,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character which(*),jobu(*),jobv(*)
+      character*1 which,jobu,jobv
       integer m,n,p,neig,maxiter,ldu,ldv,iter,liwork
       integer iwork(liwork),lwork,info,ioption(*)
       double precision U(ldu,*),V(ldv,*),Sigma(*),bnd(*),work(lwork)
@@ -422,6 +422,30 @@ c     %-----------------------------------------%
       tlansvd = t1-t0
       end
 
+
+      subroutine dlansvd_irl_largest(m,n,dim,p,neig,maxiter,
+     c     aprod,U,ldu,Sigma,bnd,V,ldv,tolin,work,lwork,iwork,
+     c     liwork,doption,ioption,info,dparm,iparm)
+
+
+c     %-----------%
+c     | Arguments |
+c     %-----------%
+      implicit none
+      character*1 which,jobu,jobv
+      integer m,n,p,neig,maxiter,ldu,ldv,iter,liwork,dim
+      integer iwork(liwork),lwork,info,ioption(*)
+      double precision U(ldu,*),V(ldv,*),Sigma(*),bnd(*),work(lwork)
+      double precision dparm(*),tolin,doption(*)
+      integer iparm(*)
+      external aprod
+
+      call dlansvd_irl('L', 'Y', 'Y',
+     c     m,n,dim,p,neig,maxiter,
+     c     aprod,U,ldu,Sigma,bnd,V,ldv,tolin,work,lwork,iwork,
+     c     liwork,doption,ioption,info,dparm,iparm)
+
+      end
 
 
 c     DLANBPRO: Computes K steps of the Lanczos bidiagonalization (LBD)
@@ -1336,7 +1360,7 @@ c If jobq=='Y' then on return Qt contains Q^T.
 c     %------------%
 c     | Parameters |
 c     %------------%
-      character jobq(*)
+      character*1 jobq
       logical ignorelast
       integer n,ldq
       double precision D(*),E(*),c1,c2,Qt(ldq,*)
@@ -1946,7 +1970,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character which(*), jobu(*),jobv(*)
+      character*1 which,jobu,jobv
       integer m,n,k,dim,ldu,ldv,in_lwrk,iwork(*)
       double precision U(ldu,*),V(ldv,*),D(*),E(*),S(*),work(*)
 
