@@ -20,7 +20,7 @@ static void extmat_matmul(double* out,
                           const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
-  SEXP rho, rV, res;
+  SEXP rho, rV, res, fcall;
   unsigned n, m;
   PROTECT_INDEX ipx;
 
@@ -29,15 +29,18 @@ static void extmat_matmul(double* out,
   m = e->m;
 
   /* Grab the environment we're going to evaluate function in */
-  rho = e->rho;
+  rho = R_WeakRefValue(e->rho);
+
+  /* Grab the function */
+  fcall = R_WeakRefValue(e->fcall);
 
   /* Allocate the memory to call R code and prepare the input*/
   PROTECT(rV = allocVector(REALSXP, m));
   Memcpy(REAL(rV), v, m);
 
   /* Call the actual function */
-  SETCADR(e->fcall, rV);
-  PROTECT_WITH_INDEX(res = eval(e->fcall, rho), &ipx);
+  SETCADR(fcall, rV);
+  PROTECT_WITH_INDEX(res = eval(fcall, rho), &ipx);
   REPROTECT(res = coerceVector(res, REALSXP), ipx);
 
   /* Prepare the output */
@@ -51,7 +54,7 @@ static void extmat_tmatmul(double* out,
                            const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
-  SEXP rho, rV, res;
+  SEXP rho, rV, res, tfcall;
   unsigned n, m;
   PROTECT_INDEX ipx;
 
@@ -60,15 +63,18 @@ static void extmat_tmatmul(double* out,
   m = e->m;
 
   /* Grab the environment we're going to evaluate function in */
-  rho = e->rho;
+  rho = R_WeakRefValue(e->rho);
+
+  /* Grab the function */
+  tfcall = R_WeakRefValue(e->tfcall);
 
   /* Allocate the memory to call R code and prepare the input*/
   PROTECT(rV = allocVector(REALSXP, n));
   Memcpy(REAL(rV), v, n);
 
   /* Call the actual function */
-  SETCADR(e->tfcall, rV);
-  PROTECT_WITH_INDEX(res = eval(e->tfcall, rho), &ipx);
+  SETCADR(tfcall, rV);
+  PROTECT_WITH_INDEX(res = eval(tfcall, rho), &ipx);
   REPROTECT(res = coerceVector(res, REALSXP), ipx);
 
   /* Prepare the output */
@@ -105,10 +111,6 @@ static void extmat_finalizer(SEXP ptr) {
 
   re = (rext_matrix*)e->matrix;
 
-  R_ReleaseObject(re->fcall);
-  R_ReleaseObject(re->tfcall);
-  R_ReleaseObject(re->rho);
-
   Free(re);
   Free(e);
   R_ClearExternalPtr(ptr);
@@ -122,11 +124,8 @@ SEXP initialize_extmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   /* Allocate memory */
   re = Calloc(1, rext_matrix);
 
-  R_PreserveObject(re->fcall = lang2(f, R_NilValue));
-  R_PreserveObject(re->tfcall = lang2(tf, R_NilValue));
   re->n = asInteger(n);
   re->m = asInteger(m);
-  R_PreserveObject(re->rho = rho);
 
   /* Create external matrix envelope */
   e = Calloc(1, ext_matrix);
@@ -139,8 +138,16 @@ SEXP initialize_extmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   e->matrix = re;
 
   /* Make an external pointer envelope */
-  emat = R_MakeExternalPtr(e, install("external matrix"), R_NilValue);
+  PROTECT(emat = R_MakeExternalPtr(e, install("external matrix"), R_NilValue));
+
+  /* Attach the fields */
+  PROTECT(re->fcall = R_MakeWeakRef(emat, lang2(f, R_NilValue), R_NilValue, 1));
+  PROTECT(re->tfcall = R_MakeWeakRef(emat, lang2(tf, R_NilValue), R_NilValue, 1));
+  PROTECT(re->rho = R_MakeWeakRef(emat, rho, R_NilValue, 1));
+
   R_RegisterCFinalizer(emat, extmat_finalizer);
+
+  UNPROTECT(4);
 
   return emat;
 }
@@ -239,7 +246,7 @@ SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
 
     /* Check agains absurd values of inputs */
     if (K != length(v))
-      error("invalid length of input vector 'v'"); 
+      error("invalid length of input vector 'v'");
 
     /* Allocate output buffer */
     PROTECT(Y = allocVector(REALSXP, L));
