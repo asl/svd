@@ -44,7 +44,7 @@ trlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
   \describe{
     \item{kmax}{integer, maximum number of iterations.}
     \item{dim}{integer, dimension of Krylov subspace.}
-    \item{p}{integer, number of shits per restart.}
+    \item{p}{integer, number of shifts per restart.}
     \item{maxiter}{integer. maximum number of restarts.}
     \item{tol}{numeric, tolerance level.}
     \item{verbose}{logical, if 'TRUE', provide verbose output.}
