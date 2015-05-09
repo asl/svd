@@ -23,10 +23,10 @@ propack.svd <- function(X, neig = min(m, n), opts = list()) {
   if (is.matrix(X)) {
     m <- dim(X)[1]; n <- dim(X)[2];
     storage.mode(X) <- "double";
-  } else if (is.extmat(X)) {
-    m <- extmat.nrow(X); n <- extmat.ncol(X);
+  } else if (.is.extmat(X)) {
+    m <- .extmat.nrow(X); n <- .extmat.ncol(X);
   } else if (is(X, "extmat")) {
-    m <- dim(X)[1]; n <- dim(X)[2];
+    m <- dim(X)[1]; n <- dim(X)[2]
     X <- X@.xData
   } else {
     stop('unsupported matrix type for SVD')

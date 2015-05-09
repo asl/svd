@@ -21,19 +21,31 @@
 
 #   Routines for external matrix stuff
 
-extmat.ncol <- function(X) {
+extmat.ncol <- function(X)
+  .extmat.ncol(X@.xData)
+
+extmat.nrow <- function(X)
+  .extmat.nrow(X@.xData)
+
+.extmat.ncol <- function(X) {
   .Call("extmat_cols", X)
 }
 
-extmat.nrow <- function(X) {
+.extmat.nrow <- function(X) {
   .Call("extmat_rows", X)
 }
 
-is.extmat <- function(X) {
+is.extmat <- function(X)
+  is(X, "extmat")
+
+.is.extmat <- function(X) {
   .Call("is_extmat", X)
 }
 
-ematmul <- function(emat, v, transposed = FALSE) {
+ematmul <- function(emat, v, transposed = FALSE)
+  .ematmul(emat@.xData, v, transposed)
+
+.ematmul <- function(emat, v, transposed = FALSE) {
   storage.mode(v) <- "double";
   storage.mode(transposed) <- "logical";
   .Call("ematmul", emat, v, transposed);
@@ -68,7 +80,7 @@ setMethod("as.logical", signature(x = "extmat"),
 setAs("extmat", "matrix", function(from) from %*% diag(nrow = ncol(from)))
 
 setMethod("dim", signature(x = "extmat"),
-          function(x) c(extmat.nrow(x@.xData), extmat.ncol(x@.xData)), valueClass = "integer")
+          function(x) c(.extmat.nrow(x@.xData), .extmat.ncol(x@.xData)), valueClass = "integer")
 setMethod("length", "extmat", function(x) prod(dim(x)))
 
 setMethod("%*%", signature(x = "extmat", y = "numeric"),
@@ -88,13 +100,13 @@ setMethod("%*%", signature(x = "extmat", y = "matrix"),
           function(x, y) {
             if (nrow(y) != ncol(x))
               stop("non-conformable arguments")
-            apply(y, 2, ematmul, emat = x@.xData, transposed = FALSE)
+            apply(y, 2, .ematmul, emat = x@.xData, transposed = FALSE)
           })
 setMethod("%*%", signature(x = "matrix", y = "extmat"),
           function(x, y) {
             if (nrow(y) != ncol(x))
               stop("non-conformable arguments")
-            t(apply(x, 1, ematmul, emat = y@.xData, transposed = TRUE))
+            t(apply(x, 1, .ematmul, emat = y@.xData, transposed = TRUE))
           })
 
 # t(m) %*% y
@@ -102,7 +114,7 @@ setMethod("crossprod", signature(x = "extmat", y = "matrix"),
           function(x, y) {
             if (nrow(y) != nrow(x))
               stop("non-conformable arguments")
-            apply(y, 2, ematmul, emat = x@.xData, transposed = TRUE)
+            apply(y, 2, .ematmul, emat = x@.xData, transposed = TRUE)
           })
 setMethod("crossprod", signature(x = "extmat", y = "numeric"),
           function(x, y) {
@@ -122,7 +134,7 @@ setMethod("crossprod", signature(x = "matrix", y = "extmat"),
           function(x, y) {
             if (nrow(y) != nrow(x))
               stop("non-conformable arguments")
-            t(apply(x, 2, ematmul, emat = y@.xData, transposed = TRUE))
+            t(apply(x, 2, .ematmul, emat = y@.xData, transposed = TRUE))
           })
 setMethod("crossprod", signature(x = "numeric", y = "extmat"),
           function(x, y) {
@@ -136,7 +148,7 @@ setMethod("tcrossprod", signature(x = "extmat", y = "matrix"),
           function(x, y) {
             if (ncol(y) != ncol(x))
               stop("non-conformable arguments")
-            apply(y, 1, ematmul, emat = x@.xData, transposed = FALSE)
+            apply(y, 1, .ematmul, emat = x@.xData, transposed = FALSE)
           })
 setMethod("tcrossprod", signature(x = "extmat", y = "numeric"),
           function(x, y) {
@@ -156,7 +168,7 @@ setMethod("tcrossprod", signature(x = "matrix", y = "extmat"),
           function(x, y) {
             if (ncol(y) != ncol(x))
               stop("non-conformable arguments")
-            t(apply(x, 1, ematmul, emat = y@.xData, transposed = FALSE))
+            t(apply(x, 1, .ematmul, emat = y@.xData, transposed = FALSE))
           })
 setMethod("tcrossprod", signature(x = "numeric", y = "extmat"),
           function(x, y) {
