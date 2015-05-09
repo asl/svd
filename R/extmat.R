@@ -165,6 +165,13 @@ setMethod("crossprod", signature(x = "extmat", y = "missing"),
             # FIXME: get rid of diag, calculate column-by-column
             crossprod(x, as.matrix(x))
           })
+setMethod("tcrossprod", signature(x = "extmat", y = "missing"),
+          function(x, y) {
+            # FIXME: get rid of diag, calculate column-by-column
+            tcrossprod(x, as.matrix(x))
+          })
+
+# TODO: crossprod(emat, emat), tcrossprod(emat, emat)
 
 # t(m %*% t(x))
 setMethod("tcrossprod", signature(x = "matrix", y = "extmat"),
