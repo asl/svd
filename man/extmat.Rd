@@ -15,7 +15,7 @@
 is.extmat(X)
 extmat.ncol(X)
 extmat.nrow(X)
-extmat(mul, tmul, nrow, ncol, env = .GlobalEnv)
+extmat(mul, tmul, nrow, ncol, env = parent.env())
 ematmul(emat, v, transposed = FALSE)
 }
 

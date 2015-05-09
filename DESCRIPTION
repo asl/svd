@@ -1,6 +1,7 @@
 Package: svd
 Type: Package
 Imports: methods
+Suggests: testthat (>= 0.7)
 Title: Interfaces to various state-of-art SVD and eigensolvers
 Version: 0.4
 Date: 2013-04-14
