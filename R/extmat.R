@@ -157,7 +157,7 @@ setMethod("tcrossprod", signature(x = "extmat", y = "matrix"),
 setMethod("tcrossprod", signature(x = "extmat", y = "numeric"),
           function(x, y) {
             dim(y) <-
-              if (nrow(x) == (n <- length(y))) c(n, 1L) else c(1L, n)
+              if (ncol(x) == (n <- length(y))) c(1L, n) else c(n, 1L)
             crossprod(x, y)
           })
 # m %*% t(m)
