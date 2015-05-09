@@ -28,11 +28,11 @@ extmat.nrow <- function(X)
   .extmat.nrow(X@.xData)
 
 .extmat.ncol <- function(X) {
-  .Call("extmat_cols", X)
+  .Call("extmat_ncol", X)
 }
 
 .extmat.nrow <- function(X) {
-  .Call("extmat_rows", X)
+  .Call("extmat_nrow", X)
 }
 
 is.extmat <- function(X)
@@ -54,7 +54,7 @@ ematmul <- function(emat, v, transposed = FALSE)
 extmat <- function(mul, tmul, nrow, ncol,
                    env = .GlobalEnv) {
   new("extmat",
-      .Call("initialize_extmat",
+      .Call("initialize_rextmat",
             as.function(mul), as.function(tmul),
             as.integer(nrow), as.integer(ncol), env))
 }

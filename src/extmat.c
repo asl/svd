@@ -15,9 +15,9 @@ typedef struct {
   unsigned m;
 } rext_matrix;
 
-static void extmat_matmul(double* out,
-                          const double* v,
-                          const void* matrix) {
+static void rextmat_matmul(double* out,
+                           const double* v,
+                           const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
   SEXP rho, rV, res, fcall;
@@ -49,9 +49,9 @@ static void extmat_matmul(double* out,
   UNPROTECT(2);
 }
 
-static void extmat_tmatmul(double* out,
-                           const double* v,
-                           const void* matrix) {
+static void rextmat_tmatmul(double* out,
+                            const double* v,
+                            const void* matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
   SEXP rho, rV, res, tfcall;
@@ -83,19 +83,19 @@ static void extmat_tmatmul(double* out,
   UNPROTECT(2);
 }
 
-static unsigned extmat_nrow(const void *matrix) {
+static unsigned rextmat_nrow(const void *matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
   return e->n;
 }
 
-static unsigned extmat_ncol(const void *matrix) {
+static unsigned rextmat_ncol(const void *matrix) {
   rext_matrix *e = (rext_matrix*)matrix;
 
   return e->m;
 }
 
-static void extmat_finalizer(SEXP ptr) {
+static void rextmat_finalizer(SEXP ptr) {
   ext_matrix *e;
   rext_matrix *re;
 
@@ -116,7 +116,7 @@ static void extmat_finalizer(SEXP ptr) {
   R_ClearExternalPtr(ptr);
 }
 
-SEXP initialize_extmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
+SEXP initialize_rextmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   ext_matrix *e;
   rext_matrix *re;
   SEXP emat;
@@ -130,10 +130,10 @@ SEXP initialize_extmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   /* Create external matrix envelope */
   e = Calloc(1, ext_matrix);
   e->type = "external matrix from R";
-  e->mulfn = extmat_matmul;
-  e->tmulfn = extmat_tmatmul;
-  e->ncol = extmat_ncol;
-  e->nrow = extmat_nrow;
+  e->mulfn = rextmat_matmul;
+  e->tmulfn = rextmat_tmatmul;
+  e->ncol = rextmat_ncol;
+  e->nrow = rextmat_nrow;
 
   e->matrix = re;
 
@@ -145,11 +145,51 @@ SEXP initialize_extmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   PROTECT(re->tfcall = R_MakeWeakRef(emat, lang2(tf, R_NilValue), R_NilValue, 1));
   PROTECT(re->rho = R_MakeWeakRef(emat, rho, R_NilValue, 1));
 
-  R_RegisterCFinalizer(emat, extmat_finalizer);
+  R_RegisterCFinalizer(emat, rextmat_finalizer);
 
   UNPROTECT(4);
 
   return emat;
+}
+
+SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
+  SEXP Y = NILSXP, tchk;
+
+  /* Perform a type checking */
+  PROTECT(tchk = is_extmat(emat));
+
+  if (LOGICAL(tchk)[0]) {
+    R_len_t K, L;
+    ext_matrix *e;
+    void *matrix;
+
+    /* Grab needed data */
+    e = R_ExternalPtrAddr(emat);
+    matrix = e->matrix;
+
+    L = (LOGICAL(transposed)[0] ? e->ncol(matrix) : e->nrow(matrix));
+    K = (LOGICAL(transposed)[0] ? e->nrow(matrix) : e->ncol(matrix));
+
+    /* Check agains absurd values of inputs */
+    if (K != length(v))
+      error("invalid length of input vector 'v'");
+
+    /* Allocate output buffer */
+    PROTECT(Y = allocVector(REALSXP, L));
+
+    /* Calculate the product */
+    if (LOGICAL(transposed)[0])
+      e->tmulfn(REAL(Y), REAL(v), matrix);
+    else
+      e->mulfn(REAL(Y), REAL(v), matrix);
+
+    UNPROTECT(1);
+  } else
+    error("pointer provided is not an external matrix");
+
+  UNPROTECT(1);
+
+  return Y;
 }
 
 SEXP is_extmat(SEXP ptr) {
@@ -184,7 +224,7 @@ SEXP is_extmat(SEXP ptr) {
   return ans;
 }
 
-SEXP extmat_rows(SEXP ptr) {
+SEXP extmat_nrow(SEXP ptr) {
   SEXP tchk;
   SEXP ans = NILSXP;
 
@@ -205,7 +245,7 @@ SEXP extmat_rows(SEXP ptr) {
   return ans;
 }
 
-SEXP extmat_cols(SEXP ptr) {
+SEXP extmat_ncol(SEXP ptr) {
   SEXP tchk;
   SEXP ans = NILSXP;
 
@@ -226,50 +266,10 @@ SEXP extmat_cols(SEXP ptr) {
   return ans;
 }
 
-SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
-  SEXP Y = NILSXP, tchk;
-
-  /* Perform a type checking */
-  PROTECT(tchk = is_extmat(emat));
-
-  if (LOGICAL(tchk)[0]) {
-    R_len_t K, L;
-    ext_matrix *e;
-    rext_matrix *re;
-
-    /* Grab needed data */
-    e = R_ExternalPtrAddr(emat);
-    re = e->matrix;
-
-    L = (LOGICAL(transposed)[0] ? re->m : re->n);
-    K = (LOGICAL(transposed)[0] ? re->n : re->m);
-
-    /* Check agains absurd values of inputs */
-    if (K != length(v))
-      error("invalid length of input vector 'v'");
-
-    /* Allocate output buffer */
-    PROTECT(Y = allocVector(REALSXP, L));
-
-    /* Calculate the product */
-    if (LOGICAL(transposed)[0])
-      extmat_tmatmul(REAL(Y), REAL(v), re);
-    else
-      extmat_matmul(REAL(Y), REAL(v), re);
-
-    UNPROTECT(1);
-  } else
-    error("pointer provided is not an external matrix");
-
-  UNPROTECT(1);
-
-  return Y;
-}
-
 void R_init_svd(DllInfo *info) {
   (void)info;
 
   R_RegisterCCallable("svd", "is_extmat", (DL_FUNC)is_extmat);
-  R_RegisterCCallable("svd", "extmat_rows", (DL_FUNC)extmat_rows);
-  R_RegisterCCallable("svd", "extmat_cols", (DL_FUNC)extmat_cols);
+  R_RegisterCCallable("svd", "extmat_nrow", (DL_FUNC)extmat_nrow);
+  R_RegisterCCallable("svd", "extmat_ncol", (DL_FUNC)extmat_ncol);
 }
