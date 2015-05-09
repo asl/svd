@@ -36,7 +36,7 @@ extmat.nrow <- function(X)
 }
 
 is.extmat <- function(X)
-  is(X, "extmat")
+  is(X, "extmat") && .is.extmat(X@.xData)
 
 .is.extmat <- function(X) {
   .Call("is_extmat", X)
