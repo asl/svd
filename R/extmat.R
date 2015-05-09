@@ -131,72 +131,28 @@ setMethod("%*%", signature(x = "extmat", y = "extmat"),
             x %*% as.matrix(y) # TODO: Calculate colunm-by-column
           })
 
-# t(m) %*% y
-setMethod("crossprod", signature(x = "extmat", y = "matrix"),
+setMethod("crossprod", signature(x = "extmat", y = "ANY"),
           function(x, y) {
-            if (nrow(y) != nrow(x))
-              stop("non-conformable arguments")
-            apply(y, 2, .ematmul, emat = x@.xData, transposed = TRUE)
+            t(x) %*% y
           })
-setMethod("crossprod", signature(x = "extmat", y = "numeric"),
+setMethod("crossprod", signature(x = "ANY", y = "extmat"),
           function(x, y) {
-            dim(y) <-
-              if (nrow(x) == (n <- length(y))) c(n, 1L) else c(1L, n)
-            crossprod(x, y)
+            t(t(y) %*% x)
           })
-# t(m) %*% m
 setMethod("crossprod", signature(x = "extmat", y = "missing"),
           function(x, y) {
-            # FIXME: get rid of as.matrix, calculate column-by-column
-            crossprod(x, as.matrix(x))
+            crossprod(x, x)
           })
 
-# t(t(m) %*% x)
-setMethod("crossprod", signature(x = "matrix", y = "extmat"),
+setMethod("tcrossprod", signature(x = "extmat", y = "ANY"),
           function(x, y) {
-            if (nrow(y) != nrow(x))
-              stop("non-conformable arguments")
-            t(apply(x, 2, .ematmul, emat = y@.xData, transposed = TRUE))
+            t(y %*% t(x))
           })
-setMethod("crossprod", signature(x = "numeric", y = "extmat"),
+setMethod("tcrossprod", signature(x = "ANY", y = "extmat"),
           function(x, y) {
-            dim(x) <-
-              if (nrow(y) == (n <- length(x))) c(1L, n) else c(n, 1L)
-            crossprod(x, y)
+            x %*% t(y)
           })
-
-# m %*% t(y)
-setMethod("tcrossprod", signature(x = "extmat", y = "matrix"),
-          function(x, y) {
-            if (ncol(y) != ncol(x))
-              stop("non-conformable arguments")
-            apply(y, 1, .ematmul, emat = x@.xData, transposed = FALSE)
-          })
-setMethod("tcrossprod", signature(x = "extmat", y = "numeric"),
-          function(x, y) {
-            dim(y) <-
-              if (ncol(x) == (n <- length(y))) c(1L, n) else c(n, 1L)
-            tcrossprod(x, y)
-          })
-# m %*% t(m)
 setMethod("tcrossprod", signature(x = "extmat", y = "missing"),
           function(x, y) {
-            # FIXME: get rid of diag, calculate column-by-column
-            tcrossprod(x, as.matrix(x))
-          })
-
-# TODO: crossprod(emat, emat), tcrossprod(emat, emat)
-
-# t(m %*% t(x))
-setMethod("tcrossprod", signature(x = "matrix", y = "extmat"),
-          function(x, y) {
-            if (ncol(y) != ncol(x))
-              stop("non-conformable arguments")
-            t(apply(x, 1, .ematmul, emat = y@.xData, transposed = FALSE))
-          })
-setMethod("tcrossprod", signature(x = "numeric", y = "extmat"),
-          function(x, y) {
-            dim(x) <-
-              if (ncol(y) == (n <- length(x))) c(1L, n) else c(n, 1L)
-            tcrossprod(x, y)
+            tcrossprod(x, x)
           })

@@ -32,8 +32,8 @@ test_that("Multiplication on vector works ok", {
 
   expect_equal(tcrossprod(e, m2), tcrossprod(m, m2))
   expect_equal(crossprod(e, m2), crossprod(m, m2))
-  # expect_equal(crossprod(e, as.extmat(m2)), crossprod(m, m2))
-  # expect_equal(tcrossprod(e, as.extmat(m2)), tcrossprod(m, m2))
+  expect_equal(crossprod(e, as.extmat(m2)), crossprod(m, m2))
+  expect_equal(tcrossprod(e, as.extmat(m2)), tcrossprod(m, m2))
 
 
   expect_equal(e %*% t(m2), m %*% t(m2))
