@@ -38,6 +38,8 @@ test_that("Multiplication on vector works ok", {
 
   expect_equal(e %*% t(m2), m %*% t(m2))
   expect_equal(t(m2) %*% e, t(m2) %*% e)
+
+  expect_equal(e %*% as.extmat(t(m2)), m %*% t(m2))
 })
 
 test_that("Empty result", {

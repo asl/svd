@@ -126,6 +126,11 @@ setMethod("%*%", signature(x = "matrix", y = "extmat"),
             res
           })
 
+setMethod("%*%", signature(x = "extmat", y = "extmat"),
+          function(x, y) {
+            x %*% as.matrix(y) # TODO: Calculate colunm-by-column
+          })
+
 # t(m) %*% y
 setMethod("crossprod", signature(x = "extmat", y = "matrix"),
           function(x, y) {
