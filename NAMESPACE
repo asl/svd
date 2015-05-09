@@ -1,5 +1,11 @@
 useDynLib(svd)
 
+importFrom("methods",
+           as, is, extends, new,
+           getClass, getClassDef, validObject,
+           setClass, setClassUnion, setMethod, setOldClass,
+           signature, representation, prototype)
+
 export(
        # External matrix stuff
        is.extmat,
@@ -12,3 +18,15 @@ export(
        # nuTRLan SVD and eigensolver
        trlan.svd,
        trlan.eigen)
+
+exportClasses(extmat)
+
+exportMethods(
+  as.array, as.matrix, as.vector, as.numeric, as.integer, as.logical,
+  dim, length,
+  "%*%",
+  crossprod, tcrossprod)
+
+S3method(as.array, extmat)
+S3method(as.matrix, extmat)
+S3method(as.vector, extmat)
