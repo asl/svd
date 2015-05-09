@@ -152,6 +152,37 @@ SEXP initialize_rextmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   return emat;
 }
 
+SEXP ematmul_unchecked(SEXP emat, SEXP v, SEXP transposed) {
+  SEXP Y = NILSXP;
+  R_len_t K, L;
+  ext_matrix *e;
+  void *matrix;
+
+  /* Grab needed data */
+  e = R_ExternalPtrAddr(emat);
+  matrix = e->matrix;
+
+  L = (LOGICAL(transposed)[0] ? e->ncol(matrix) : e->nrow(matrix));
+  K = (LOGICAL(transposed)[0] ? e->nrow(matrix) : e->ncol(matrix));
+
+  /* Check agains absurd values of inputs */
+  if (K != length(v))
+    error("invalid length of input vector 'v'");
+
+  /* Allocate output buffer */
+  PROTECT(Y = allocVector(REALSXP, L));
+
+  /* Calculate the product */
+  if (LOGICAL(transposed)[0])
+    e->tmulfn(REAL(Y), REAL(v), matrix);
+  else
+    e->mulfn(REAL(Y), REAL(v), matrix);
+
+  UNPROTECT(1);
+
+  return Y;
+}
+
 SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
   SEXP Y = NILSXP, tchk;
 
@@ -159,31 +190,7 @@ SEXP ematmul(SEXP emat, SEXP v, SEXP transposed) {
   PROTECT(tchk = is_extmat(emat));
 
   if (LOGICAL(tchk)[0]) {
-    R_len_t K, L;
-    ext_matrix *e;
-    void *matrix;
-
-    /* Grab needed data */
-    e = R_ExternalPtrAddr(emat);
-    matrix = e->matrix;
-
-    L = (LOGICAL(transposed)[0] ? e->ncol(matrix) : e->nrow(matrix));
-    K = (LOGICAL(transposed)[0] ? e->nrow(matrix) : e->ncol(matrix));
-
-    /* Check agains absurd values of inputs */
-    if (K != length(v))
-      error("invalid length of input vector 'v'");
-
-    /* Allocate output buffer */
-    PROTECT(Y = allocVector(REALSXP, L));
-
-    /* Calculate the product */
-    if (LOGICAL(transposed)[0])
-      e->tmulfn(REAL(Y), REAL(v), matrix);
-    else
-      e->mulfn(REAL(Y), REAL(v), matrix);
-
-    UNPROTECT(1);
+    Y = ematmul_unchecked(emat, v, transposed);
   } else
     error("pointer provided is not an external matrix");
 

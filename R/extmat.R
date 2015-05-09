@@ -42,13 +42,16 @@ is.extmat <- function(X)
   .Call("is_extmat", X)
 }
 
-ematmul <- function(emat, v, transposed = FALSE)
-  .ematmul(emat@.xData, v, transposed)
+ematmul <- function(emat, v, transposed = FALSE) {
+  storage.mode(v) <- "double";
+  storage.mode(transposed) <- "logical";
+  .Call("ematmul", emat@.xData, v, transposed);
+}
 
 .ematmul <- function(emat, v, transposed = FALSE) {
   storage.mode(v) <- "double";
   storage.mode(transposed) <- "logical";
-  .Call("ematmul", emat, v, transposed);
+  .Call("ematmul_unchecked", emat, v, transposed);
 }
 
 extmat <- function(mul, tmul, nrow, ncol,
