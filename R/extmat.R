@@ -88,12 +88,12 @@ setMethod("dim", signature(x = "extmat"),
 setMethod("length", "extmat", function(x) prod(dim(x)))
 
 setMethod("t", signature(x = "extmat"),
-          function(emat) {
-            emat.ptr <- emat@.xData
+          function(x) {
+            emat <- x@.xData
 
-            extmat(mul = function(v) .ematmul(emat.ptr, v, transposed = TRUE),
-                   tmul = function(v) .ematmul(emat.ptr, v, transposed = FALSE),
-                   nrow = ncol(emat), ncol = nrow(emat))
+            extmat(mul = function(v) .ematmul(emat, v, transposed = TRUE),
+                   tmul = function(v) .ematmul(emat, v, transposed = FALSE),
+                   nrow = ncol(x), ncol = nrow(x))
           })
 
 setMethod("%*%", signature(x = "extmat", y = "numeric"),
