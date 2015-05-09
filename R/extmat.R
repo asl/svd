@@ -158,10 +158,10 @@ setMethod("tcrossprod", signature(x = "extmat", y = "numeric"),
           function(x, y) {
             dim(y) <-
               if (nrow(x) == (n <- length(y))) c(n, 1L) else c(1L, n)
-            crossprod(x, y)
+            tcrossprod(x, y)
           })
 # m %*% t(m)
-setMethod("crossprod", signature(x = "extmat", y = "missing"),
+setMethod("trossprod", signature(x = "extmat", y = "missing"),
           function(x, y) {
             # FIXME: get rid of diag, calculate column-by-column
             tcrossprod(x, as.matrix(x))
