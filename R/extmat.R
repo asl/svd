@@ -58,7 +58,7 @@ extmat <- function(mul, tmul, nrow, ncol,
                    env = parent.env()) {
   new("extmat",
       .Call("initialize_rextmat",
-            as.function(mul), as.function(tmul),
+            match.fun(mul), match.fun(tmul),
             as.integer(nrow), as.integer(ncol), env))
 }
 
