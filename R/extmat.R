@@ -55,7 +55,7 @@ ematmul <- function(emat, v, transposed = FALSE) {
 }
 
 extmat <- function(mul, tmul, nrow, ncol,
-                   env = .GlobalEnv) {
+                   env = parent.env()) {
   new("extmat",
       .Call("initialize_rextmat",
             match.fun(mul), match.fun(tmul),
