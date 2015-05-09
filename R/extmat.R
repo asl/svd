@@ -58,8 +58,9 @@ extmat <- function(mul, tmul, nrow, ncol,
                    env = .GlobalEnv) {
   new("extmat",
       .Call("initialize_rextmat",
-            as.function(mul), as.function(tmul),
-            as.integer(nrow), as.integer(ncol), env))
+            match.fun(mul), match.fun(tmul),
+            as.integer(nrow), as.integer(ncol),
+            env))
 }
 
 # S4 weirdness
