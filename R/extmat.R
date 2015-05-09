@@ -128,7 +128,12 @@ setMethod("%*%", signature(x = "matrix", y = "extmat"),
 
 setMethod("%*%", signature(x = "extmat", y = "extmat"),
           function(x, y) {
-            x %*% as.matrix(y) # TODO: Calculate colunm-by-column
+            res <- apply(diag(ncol(y)), 2,
+                         function(u, emat.x, emat.y)
+                           .ematmul(emat = emat.x, .ematmul(emat = emat.y, u)),
+                         emat.x = x@.xData, emat.y = y@.xData)
+            dim(res) <- c(nrow(x), ncol(y))
+            res
           })
 
 setMethod("crossprod", signature(x = "extmat", y = "ANY"),
