@@ -113,13 +113,17 @@ setMethod("%*%", signature(x = "extmat", y = "matrix"),
           function(x, y) {
             if (nrow(y) != ncol(x))
               stop("non-conformable arguments")
-            apply(y, 2, .ematmul, emat = x@.xData, transposed = FALSE)
+            res <- apply(y, 2, .ematmul, emat = x@.xData, transposed = FALSE)
+            dim(res) <- c(nrow(x), ncol(y))
+            res
           })
 setMethod("%*%", signature(x = "matrix", y = "extmat"),
           function(x, y) {
             if (nrow(y) != ncol(x))
               stop("non-conformable arguments")
-            t(apply(x, 1, .ematmul, emat = y@.xData, transposed = TRUE))
+            res <- t(apply(x, 1, .ematmul, emat = y@.xData, transposed = TRUE))
+            dim(res) <- c(nrow(x), ncol(y))
+            res
           })
 
 # t(m) %*% y

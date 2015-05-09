@@ -39,3 +39,13 @@ test_that("Multiplication on vector works ok", {
   expect_equal(e %*% t(m2), m %*% t(m2))
   expect_equal(t(m2) %*% e, t(m2) %*% e)
 })
+
+test_that("Empty result", {
+  set.seed(1)
+  m <- matrix(rnorm(12), 3, 4)
+  m2 <- matrix(rnorm(12), 3, 4)
+
+  e <- as.extmat(m)
+  expect_equal(e %*% matrix(0, ncol(e), 0), matrix(0, nrow(e), 0))
+  expect_equal(matrix(0, 0, nrow(e)) %*% e, matrix(0, 0, ncol(e)))
+})
