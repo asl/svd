@@ -25,7 +25,8 @@ exportMethods(
   as.array, as.matrix, as.vector, as.numeric, as.integer, as.logical,
   dim, length,
   "%*%",
-  crossprod, tcrossprod)
+  crossprod, tcrossprod,
+  t)
 
 S3method(as.array, extmat)
 S3method(as.matrix, extmat)

@@ -11,14 +11,6 @@ as.extmat <- function(m) {
 }
 
 
-t.extmat <- function(emat) {
-  emat.ptr <- emat@.xData
-
-  extmat(mul = function(v) .ematmul(emat.ptr, v, transposed = TRUE),
-         tmul = function(v) .ematmul(emat.ptr, v, transposed = FALSE),
-         nrow = ncol(emat), ncol = nrow(emat))
-}
-
 test_that("Transposition (using closures) properly work", {
   set.seed(1)
   m <- matrix(rnorm(12), 3, 4)
