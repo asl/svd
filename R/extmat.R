@@ -88,12 +88,12 @@ setMethod("dim", signature(x = "extmat"),
 setMethod("length", "extmat", function(x) prod(dim(x)))
 
 setMethod("t", signature(x = "extmat"),
-          function(emat) {
-            emat.ptr <- emat@.xData
+          function(x) {
+            emat <- x@.xData
 
-            extmat(mul = function(v) .ematmul(emat.ptr, v, transposed = TRUE),
-                   tmul = function(v) .ematmul(emat.ptr, v, transposed = FALSE),
-                   nrow = ncol(emat), ncol = nrow(emat))
+            extmat(mul = function(v) .ematmul(emat, v, transposed = TRUE),
+                   tmul = function(v) .ematmul(emat, v, transposed = FALSE),
+                   nrow = ncol(x), ncol = nrow(x))
           })
 
 setMethod("%*%", signature(x = "extmat", y = "numeric"),
@@ -128,7 +128,12 @@ setMethod("%*%", signature(x = "matrix", y = "extmat"),
 
 setMethod("%*%", signature(x = "extmat", y = "extmat"),
           function(x, y) {
-            x %*% as.matrix(y) # TODO: Calculate colunm-by-column
+            res <- apply(diag(ncol(y)), 2,
+                         function(u, emat.x, emat.y)
+                           .ematmul(emat = emat.x, .ematmul(emat = emat.y, u)),
+                         emat.x = x@.xData, emat.y = y@.xData)
+            dim(res) <- c(nrow(x), ncol(y))
+            res
           })
 
 setMethod("crossprod", signature(x = "extmat", y = "ANY"),
