@@ -136,6 +136,10 @@ setMethod("%*%", signature(x = "extmat", y = "extmat"),
             res
           })
 
+setMethod("crossprod", signature(x = "extmat", y = "extmat"),
+          function(x, y) {
+            t(x) %*% y
+          })
 setMethod("crossprod", signature(x = "extmat", y = "ANY"),
           function(x, y) {
             t(x) %*% y
@@ -149,6 +153,10 @@ setMethod("crossprod", signature(x = "extmat", y = "missing"),
             crossprod(x, x)
           })
 
+setMethod("tcrossprod", signature(x = "extmat", y = "extmat"),
+          function(x, y) {
+            t(y %*% t(x))
+          })
 setMethod("tcrossprod", signature(x = "extmat", y = "ANY"),
           function(x, y) {
             t(y %*% t(x))
