@@ -255,7 +255,7 @@ int ztrl_read_checkpoint(char *filename, int nrow, trl_dcomplex * evec,
       Rprintf("TRL_READ_CHECKPOINT: Nrow mismatch.\n");
 	return -213;
     }
-    if (*j2 > min(nalpha, min(nbeta, mev + nbas - 1))) {
+    if (*j2 > imin2(nalpha, imin2(nbeta, mev + nbas - 1))) {
       Rprintf("TRL_READ_CHECKPOINT: MAXLAN too small.");
 	return -214;
     }
@@ -270,7 +270,7 @@ int ztrl_read_checkpoint(char *filename, int nrow, trl_dcomplex * evec,
 	    return close_file(io_fp, -215, -216);
 	}
     }
-    *j1 = min(mev, *j2);
+    *j1 = imin2(mev, *j2);
     *j2 = *j2 - *j1;
     if (*j1 < mev) {
 	for (i = 0; i <= *j1; i++) {
@@ -400,9 +400,9 @@ void ztrl_check_orth(trl_info * info, int nrow, trl_dcomplex * v1,
 	if (i == 0) {
 	    wrk[i + 1].r = fabs(wrk[i].r);
 	} else {
-	    wrk[i + 1].r = max(wrk[i].r, wrk[i - 1].r);
+	    wrk[i + 1].r = fmax2(wrk[i].r, wrk[i - 1].r);
 	}
-	nrminf = max(nrminf, wrk[i + 1].r);
+	nrminf = fmax2(nrminf, wrk[i + 1].r);
     }
     for (i = 0; i < j2; i++) {
 	j = j1 + i;
@@ -423,7 +423,7 @@ void ztrl_check_orth(trl_info * info, int nrow, trl_dcomplex * v1,
 	}
 	trl_zdotc(&tmp, j, wrk, c__1, wrk, c__1);
 	nrmfro += (2 * tmp.r + wrk[j].r * wrk[j].r + wrk[j].i * wrk[j].i);
-	nrminf = max(nrminf, fabs(wrk[j].r));
+	nrminf = fmax2(nrminf, fabs(wrk[j].r));
     }
     fprintf(info->log_fp,
 	    "Frobenius norm of orthogonality level %10i %4i  %14.5e\n",
@@ -520,7 +520,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
 	j1 = m1 - 1;
     }
     jnd = j1 + j2;
-    if (lwrk < jnd * 4 + max(jnd * 4, nrow)) {
+    if (lwrk < jnd * 4 + imax2(jnd * 4, nrow)) {
 	fprintf(info->log_fp,
 		"TRL_CHECK_RECURRENCE: not enough workspace.\n");
 	return;
@@ -554,7 +554,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
     // aq = A * v1(:,i) - alpha(i) * v1(:,i)
     // bet(i) = aq' * aq
     // cs(i) = aq' *
-    for (i = 0; i < min(j1, kept); i++) {
+    for (i = 0; i < imin2(j1, kept); i++) {
       op(&nrow, &i__1, &v1[i * ld1], &ld1, aq, &nrow, lparam);
 	//printf( "1: alpha[%d]\n",i );
 	for (ii = 0; ii < nrow; ii++) {
@@ -610,7 +610,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
       op(&nrow, &i__1, qkp1, &ldqkp1, aq, &nrow, lparam);
 	trl_zdotc(&(alf[kept]), nrow, aq, c__1, qkp1, c__1);
 	zdaxpy_(nrow, -alpha[kept], qkp1, aq);
-	for (i = 0; i < min(j1, kept); i++) {
+	for (i = 0; i < imin2(j1, kept); i++) {
 	    zdaxpy_(nrow, -beta[i], &v1[i * ld1], aq);
 	}
 	for (i = 0; i < kept - j1; i++) {
@@ -690,7 +690,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
 	    }
 	}
     }
-    for (i = max(0, kept - j1 + 1); i < j2; i++) {
+    for (i = imax2(0, kept - j1 + 1); i < j2; i++) {
 	j = i + j1;
 	op(&nrow, &i__1, &v2[i * ld2], &ld2, aq, &nrow, lparam);
 	if (i > 0) {

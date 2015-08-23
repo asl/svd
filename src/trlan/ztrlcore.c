@@ -260,7 +260,7 @@ void zprint_restart_state(trl_info * info, char *title, int nrow,
 	trl_print_real(info, title, kept + locked, betrot, 1);
     }
     if (info->verbose > 7) {
-	for (j1 = 0; j1 < min(kept, info->verbose); j1++) {
+	for (j1 = 0; j1 < imin2(kept, info->verbose); j1++) {
 	    for (j2 = 0; j2 <= j1; j2++) {
 		wrk2[j2] =
 		    trl_ddot(jml, &yy[j2 * jml], c__1, &yy[j1 * jml],
@@ -272,14 +272,14 @@ void zprint_restart_state(trl_info * info, char *title, int nrow,
 	}
     }
     if (info->verbose > 10) {
-	for (j1 = 0; min(kept, info->verbose); j1++) {
+	for (j1 = 0; imin2(kept, info->verbose); j1++) {
 	    sprintf(title, "eigenvector %d of Q'AQ ..", j1);
 	    trl_print_real(info, title, jml, &yy[(j1 - 1) * jml], 1);
 	}
     }
     if (info->verbose > 10) {
-	int j1n = min(nrow, info->verbose);
-	for (j1 = 0; j1 < min(kept + locked, mev); j1++) {
+	int j1n = imin2(nrow, info->verbose);
+	for (j1 = 0; j1 < imin2(kept + locked, mev); j1++) {
 	    sprintf(title, "Ritz vector %d (1:%d) ..", j1, j1n);
 	    trl_print_complex_(info, title, j1n, &evec[j1 * lde], 1);
 	}
@@ -344,14 +344,14 @@ void zprint_final_state(trl_info * info, char *title, int nrow, int mev,
 	trl_print_real(info, title, kept, beta, 1);
     }
     if (info->verbose > 8) {
-	for (j1 = 0; j1 < min(kept, info->verbose); j1++) {
+	for (j1 = 0; j1 < imin2(kept, info->verbose); j1++) {
 	    sprintf(title, "Eigenvector %d of Q''AQ ..", j1);
 	    trl_print_real(info, title, jml, &yy[j1 * jml], 1);
 	}
     }
     if (info->verbose > 10) {
-	int j1n = min(nrow, info->verbose);
-	for (j1 = 0; j1 < min(kept, mev); j1++) {
+	int j1n = imin2(nrow, info->verbose);
+	for (j1 = 0; j1 < imin2(kept, mev); j1++) {
 	    sprintf(title, "Ritz vector %d (1:%d) ..", j1, j1n);
 	    trl_print_complex_(info, title, j1n, &evec[j1 * lde], 1);
 	}
@@ -571,7 +571,7 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 //   alpha: wrk(1:maxlan), beta: wrk(maxlan+1:2*maxlan),
 //   alfrot: wrk(2*maxlan+1:3*maxlan), betrot: wrk(3*maxlan+1:4*maxlan)
 //
-    nbas = nrow * max(1, info->maxlan - mev + 1);
+    nbas = nrow * imax2(1, info->maxlan - mev + 1);
     base = Calloc(nbas, trl_dcomplex);
     alpha = Calloc(info->maxlan, double);
     beta = Calloc(info->maxlan, double);
@@ -635,7 +635,7 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 // we will perform the first convergence test after next_test
 // matrix-vector multiplications
     i1 = info->ned - jnd;
-    next_test = i1 + min(i1, min(6, info->ned / 2));
+    next_test = i1 + imin2(i1, imin2(6, info->ned / 2));
 //
 //*************************************************//
 //            -- the TRLan outer loop --           //
@@ -929,7 +929,7 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 		}
 #endif
 
-		i1 = min(mev, jnd);
+		i1 = imin2(mev, jnd);
 		memcpy(eval, dwrk, i1 * sizeof(double));
 		trl_convergence_test(jnd, lambda, res, info, dwrk);
 		//
@@ -1131,7 +1131,7 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 	    } else {
 		next_test = next_test + info->maxlan;
 	    }
-	    i1 = min(mev, jnd);
+	    i1 = imin2(mev, jnd);
 	    if (i1 > 0)
 		memcpy(eval, lambda, i1 * sizeof(double));
 	    if (jnd < mev) {
@@ -1157,10 +1157,10 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 	    //
 	    // all wanted eigenpairs converged or maximum MATVEC used
 	    // sort the eigenvalues in final output order
-	    kept = min(info->nec, max(info->ned, mev - 1));
+	    kept = imin2(info->nec, imax2(info->ned, mev - 1));
 	    info->nec = kept;
 	    if (kept == 0)
-		kept = min(mev - 1, info->ned);
+		kept = imin2(mev - 1, info->ned);
 	    trl_sort_eig(jnd, info->lohi, kept, info->ref, lambda, res);
 	    memcpy(eval, lambda, kept * sizeof(double));
 	    if (kept * 3 < jnd) {
@@ -1454,7 +1454,7 @@ void ztrl_initial_guess(int nrow, trl_dcomplex * evec, int lde, int mev,
 		    evec[j * lde + k].r = 1.0;
 		    evec[j * lde + k].i = 1.0;
 		}
-		nran = min(-info->guess, lwrk);
+		nran = imin2(-info->guess, lwrk);
 		nran = 2 * (nran / 2);
     GetRNGstate();
 		if (nran < nrow) {
@@ -1653,13 +1653,13 @@ void ztrl_ritz_vectors(int nrow, int lck, int ny, double *yy, int ldy,
 	yy2[i].i = 0.0;
     }
 
-    kv1 = min(m1 - il1 + 1, ny);
+    kv1 = imin2(m1 - il1 + 1, ny);
     memset(wrk, 0, lwrk1 * sizeof(trl_dcomplex));
     //printf( "ny=%d\r\n",ny );
     if (ny > 1) {
 	stride = lwrk1 / ny;
 	for (i = 0; i < nrow; i += stride) {
-	    j = min(nrow - 1, i + stride - 1);
+	    j = imin2(nrow - 1, i + stride - 1);
 	    k = j - i + 1;
 
 	    //printf( "j1l=%d",jl1 );
@@ -1703,7 +1703,7 @@ void ztrl_ritz_vectors(int nrow, int lck, int ny, double *yy, int ldy,
     } else if (ny == 1) {
 	stride = lwrk1;
 	for (i = 0; i < nrow; i += stride) {
-	    j = min(nrow - 1, i + stride - 1);
+	    j = imin2(nrow - 1, i + stride - 1);
 	    k = j - i + 1;
 	    if (jl1 > 0) {
 		/*
@@ -1826,7 +1826,7 @@ void ztrl_orth(int nrow, trl_dcomplex * v1, int ld1, int m1,
 // check for workspace size
     jnd = m1 + m2;
     jm1 = jnd - 1;
-    if (ld1 >= nrow && ld2 >= nrow && lwrk >= max(4, jnd + jnd)) {
+    if (ld1 >= nrow && ld2 >= nrow && lwrk >= imax2(4, jnd + jnd)) {
 	info->stat = 0;
     } else {
 	info->stat = -101;
@@ -2134,10 +2134,8 @@ int ztrl_cgs(trl_info * info, int nrow, trl_dcomplex * v1, int ld1,
 		    tmp = unif_rand();
 		    i = (int) (nrow * tmp);
 		    k = i +
-          (int) (max
-                 (1.0,
-                  (nrow *
-                   sqrt(DBL_EPSILON * old_rnrm / *rnrm))));
+          (int) (fmax2(1.0,
+                       (nrow * sqrt(DBL_EPSILON * old_rnrm / *rnrm))));
 		    for (j = i; j < k; j++) {
           tmp = unif_rand();
           while (fabs(tmp - 0.5) <= DBL_EPSILON) {

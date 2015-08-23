@@ -171,7 +171,7 @@ ztrlan(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
   // open log and checkpoint files
   trl_open_logfile(info);
   if (info->verbose > 0) {
-    nbas = max(1, info->maxlan - mev + 1);
+    nbas = imax2(1, info->maxlan - mev + 1);
     ldb = ((nrow + 3) / 4) * 4;
     if ((ldb % 4096) == 0)
       ldb = ldb + 4;
@@ -356,7 +356,7 @@ ztrl_check_ritz(ztrl_matprod op, trl_info * info, int nrow, int ncol,
   gapl = alpha[ncol - 1] - alpha[0];
   for (i = 0; i < ncol - 1; i++) {
     gapr = alpha[i + 1] - alpha[i];
-    gapl = min(gapl, gapr);
+    gapl = fmin2(gapl, gapr);
     if (res[i] >= gapl) {
       err[i] = res[i];
     } else {

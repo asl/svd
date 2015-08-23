@@ -3,16 +3,6 @@
 
 #include "ztrlan.h"
 
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
-
-#define min(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
-
 void trl_zaxpy(int n, trl_dcomplex za, trl_dcomplex * zx, int incx,
                trl_dcomplex * zy, int incy);
 void trl_zgemv(char *trans, int m, int n, trl_dcomplex alpha,
