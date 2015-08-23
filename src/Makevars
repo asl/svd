@@ -6,9 +6,13 @@ PKG_CFLAGS=-I../inst/include
 PROPACK_OBJS=propack/dlansvd_irl.o propack/printstat.o propack/second.o \
              propack/propack_svd.o
 
-TRLAN_OBJS=trlan/dsort2.o trlan/dstqrb.o trlan/trlcore.o trlan/trlaux.o \
+TRLAN_OBJS=trlan/dsort2.o trlan/dstqrb.o 				\
+           trlan/trlcore.o trlan/trlaux.o 				\
            trlan/trlan.o trlan/trl_comm_none.o trlan/trlmap.o           \
-           trlan/restart.o trlan/trlan_R.o
+           trlan/restart.o 						\
+           trlan/ztrl_comm_none.o trlan/ztrlan.o trlan/ztrlcore.o	\
+           trlan/ztrlaux.o trlan/zdaxpy.o trlan/zdgemv.o		\
+	   trlan/trlan_R.o trlan/ztrlan_R.o
 
 SVD_OBJS=extmat.o 
 

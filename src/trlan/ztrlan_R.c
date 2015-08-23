@@ -1,6 +1,6 @@
 /*
  *   R package for Singular Spectrum Analysis
- *   Copyright (c) 2009 Anton Korobeynikov <asl@math.spbu.ru>
+ *   Copyright (c) 2015 Anton Korobeynikov <anton at korobeynikov dot info>
  *
  *   This program is free software; you can redistribute it
  *   and/or modify it under the terms of the GNU General Public
@@ -24,74 +24,27 @@
 #include <Rdefines.h>
 #include <R_ext/Utils.h>
 #include <R_ext/BLAS.h>
+#include <R_ext/Complex.h>
 
 #include "extmat.h"
-#include "trlan.h"
+#include "ztrlan.h"
 
 typedef struct {
   void *matrix;
-  double *tmp;
+  Rcomplex *tmp;
   R_len_t m, n;
 } op_param;
 
 #define UNUSED(x) (void)(x)
 
-void extmat_op(int *pnrow, int *pncol,
-               double *xin, int *pldx,
-               double *yout, int *pldy,
-               void *lparam) {
-  op_param *param = lparam;
-  const ext_matrix *e = param->matrix;
-  double *tmp = param->tmp;
-
-  int ncol = *pncol, ldx  = *pldx, ldy  = *pldy, i;
-  UNUSED(pnrow);
-
-  for (i = 0; i < ncol; ++i) {
-    e->tmulfn(tmp, xin+i*ldx, e->matrix);
-    e->mulfn(yout+i*ldy, tmp, e->matrix);
-  }
-}
-
-void extmat_op_eigen(int *pnrow, int *pncol,
-                     double *xin, int *pldx,
-                     double *yout, int *pldy,
-                     void *lparam) {
-  op_param *param = lparam;
-  const ext_matrix *e = param->matrix;
-
-  int ncol = *pncol, ldx  = *pldx, ldy  = *pldy, i;
-  UNUSED(pnrow);
-
-  for (i = 0; i < ncol; ++i)
-    e->mulfn(yout+i*ldy, xin+i*ldx, e->matrix);
-}
-
-void extmat_op2(int *pnrow, int *pncol,
-                double *xin, int *pldx,
-                double *yout, int *pldy,
-                void *lparam) {
-  op_param *param = lparam;
-  const ext_matrix *e = param->matrix;
-  R_len_t m = param->m;
-
-  int ncol = *pncol, ldx  = *pldx, ldy  = *pldy, i;
-  UNUSED(pnrow);
-
-  for (i = 0; i < ncol; ++i) {
-    e->mulfn(yout+i*ldy, xin+i*ldx+m, e->matrix);
-    e->tmulfn(yout+i*ldy+m, xin+i*ldx, e->matrix);
-  }
-}
-
 static void dense_op(int *pnrow, int *pncol,
-                     double *xin, int *pldx,
-                     double *yout, int *pldy,
+                     Rcomplex *xin, int *pldx,
+                     Rcomplex *yout, int *pldy,
                      void *lparam) {
   op_param *param = lparam;
-  double *A   = param->matrix;
-  double *tmp = param->tmp;
-  double one = 1.0, zero = 0.0; int i1 = 1;
+  Rcomplex *A   = param->matrix;
+  Rcomplex *tmp = param->tmp;
+  Rcomplex one = { .r = 1.0, .i = 0.0 }, zero = { .r = 0.0, .i = 0.0 }; int i1 = 1;
   int ncol = *pncol, ldx  = *pldx, ldy  = *pldy, i;
   int m = param->m, n = param->n;
   char transt = 'T', transn = 'N';
@@ -99,20 +52,20 @@ static void dense_op(int *pnrow, int *pncol,
   UNUSED(pnrow);
 
   for (i = 0; i < ncol; ++i) {
-    F77_CALL(dgemv)(&transt, &m, &n, &one, A, &m,
+    F77_CALL(zgemv)(&transt, &m, &n, &one, A, &m,
                     xin+i*ldx, &i1, &zero, tmp, &i1);
-    F77_CALL(dgemv)(&transn, &m, &n, &one, A, &m,
+    F77_CALL(zgemv)(&transn, &m, &n, &one, A, &m,
                     tmp, &i1, &zero, yout+i*ldy, &i1);
   }
 }
 
 static void dense_op_eigen(int *pnrow, int *pncol,
-                           double *xin, int *pldx,
-                           double *yout, int *pldy,
+                           Rcomplex *xin, int *pldx,
+                           Rcomplex *yout, int *pldy,
                            void *lparam) {
   op_param *param = lparam;
-  double *A   = param->matrix;
-  double one = 1.0, zero = 0.0; int i1 = 1;
+  Rcomplex *A   = param->matrix;
+  Rcomplex one = { .r = 1.0, .i = 0.0 }, zero = { .r = 0.0, .i = 0.0 }; int i1 = 1;
   int ncol = *pncol, ldx  = *pldx, ldy  = *pldy, i;
   int m = param->m, n = param->n;
   char transn = 'N';
@@ -120,7 +73,7 @@ static void dense_op_eigen(int *pnrow, int *pncol,
   UNUSED(pnrow);
 
   for (i = 0; i < ncol; ++i)
-    F77_CALL(dgemv)(&transn, &m, &n, &one, A, &m,
+    F77_CALL(zgemv)(&transn, &m, &n, &one, A, &m,
                     xin+i*ldx, &i1, &zero, yout+i*ldy, &i1);
 }
 
@@ -144,14 +97,16 @@ static SEXP getListElement(SEXP list, const char *str) {
   } while(0)
 
 /* Main driver routine for TRLAN */
-SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
-               SEXP ilambda, SEXP iU) {
-  R_len_t m = 0, n = 0, kmax, lwrk, computed = 0;
+SEXP ztrlan_svd(SEXP A, SEXP ne, SEXP opts,
+                SEXP ilambda, SEXP iU) {
+  R_len_t m = 0, n = 0, kmax, lwrk, ldwrk, computed = 0;
   int neig = *INTEGER(ne), maxiter, i, verbose;
-  double *wrk, *eval, *evec, tol, *rF, *rU;
+  double *dwrk, *eval, tol, *rF;
+  Rcomplex *rU;
+  Rcomplex *wrk, *evec;
   op_param param;
   trl_info info;
-  trl_matprod opfn = NULL;
+  ztrl_matprod opfn = NULL;
   SEXP F, U, res;
 
   /* Check source time and grab dimensions */
@@ -159,19 +114,8 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
     /* Ordinary matrix case */
     int *dimA = INTEGER(getAttrib(A, R_DimSymbol));
     m = dimA[0]; n = dimA[1];
-    param.matrix = REAL(A);
+    param.matrix = COMPLEX(A);
     opfn = dense_op;
-  } else if (TYPEOF(A) == EXTPTRSXP &&
-             R_ExternalPtrTag(A) == install("external matrix")) {
-    /* External matrix case */
-    ext_matrix *e = R_ExternalPtrAddr(A);
-    m = e->nrow(e->matrix); n = e->ncol(e->matrix);
-    param.matrix = e;
-#ifdef CYCLIC
-    opfn = extmat_op2;
-#else
-    opfn = extmat_op;
-#endif
   } else
     error("unsupported input matrix 'A' type");
 
@@ -182,7 +126,7 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
 #else
   param.m = m; param.n = n;
 #endif
-  param.tmp = (double*)R_alloc(n, sizeof(double));
+  param.tmp = (Rcomplex*)R_alloc(n, sizeof(Rcomplex));
 
   /* Fix number of requested eigentriples */
   if (neig > m) neig = m;
@@ -202,10 +146,12 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
   /* Verboseness */
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
-  lwrk = kmax*(kmax+10);
-  wrk  = Calloc(lwrk, double);
+  ldwrk = kmax*(kmax+10);
+  dwrk  = Calloc(ldwrk, double);
+  lwrk = m*(kmax+10);
+  wrk  = Calloc(lwrk, Rcomplex);
   eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, double);
+  evec = Calloc(kmax*m, Rcomplex);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -237,16 +183,17 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
       double lambda = REAL(ilambda)[i];
       eval[i] = lambda * lambda;
     }
-    Memcpy(evec, REAL(iU), computed*m);
+    Memcpy(evec, COMPLEX(iU), computed*m);
   }
 
   /* The Lanczos recurrence is set to start with [1,1,...,1]^T */
   trl_set_iguess(&info, computed, -1, 0, NULL);
 
-  trlan(opfn, &info, m, kmax, eval, evec, m, lwrk, wrk, &param);
+  ztrlan(opfn, &info, m, kmax, eval, evec, m, wrk, lwrk, dwrk, ldwrk, &param);
 
   /* Cleanup */
   Free(wrk);
+  Free(dwrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -259,7 +206,7 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
 
   /* Form the result */
   PROTECT(F = allocVector(REALSXP, neig)); rF = REAL(F);
-  PROTECT(U = allocMatrix(REALSXP, m, neig)); rU = REAL(U);
+  PROTECT(U = allocMatrix(CPLXSXP, m, neig)); rU = COMPLEX(U);
 
   for (i = 0; i < neig; ++i) {
     R_len_t idx = info.nec - i - 1;
@@ -282,14 +229,16 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
   return res;
 }
 
-SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
-                 SEXP ilambda, SEXP iU) {
-  R_len_t m = 0, n = 0, kmax, lwrk, computed = 0;
+SEXP ztrlan_eigen(SEXP A, SEXP ne, SEXP opts,
+                  SEXP ilambda, SEXP iU) {
+  R_len_t m = 0, n = 0, kmax, lwrk, ldwrk, computed = 0;
   int neig = *INTEGER(ne), maxiter, i, verbose;
-  double *wrk, *eval, *evec, tol, *rF, *rU;
+  double *dwrk, *eval , tol, *rF;
+  Rcomplex *rU;
+  Rcomplex *wrk, *evec;
   op_param param;
   trl_info info;
-  trl_matprod opfn = NULL;
+  ztrl_matprod opfn = NULL;
   SEXP F, U, res;
 
   /* Check source time and grab dimensions */
@@ -297,15 +246,8 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
     /* Ordinary matrix case */
     int *dimA = INTEGER(getAttrib(A, R_DimSymbol));
     m = dimA[0]; n = dimA[1];
-    param.matrix = REAL(A);
+    param.matrix = COMPLEX(A);
     opfn = dense_op_eigen;
-  } else if (TYPEOF(A) == EXTPTRSXP &&
-             R_ExternalPtrTag(A) == install("external matrix")) {
-    /* External matrix case */
-    ext_matrix *e = R_ExternalPtrAddr(A);
-    m = e->nrow(e->matrix); n = e->ncol(e->matrix);
-    param.matrix = e;
-    opfn = extmat_op_eigen;
   } else
     error("unsupported input matrix 'A' type");
 
@@ -331,10 +273,12 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
   /* Verboseness */
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
-  lwrk = kmax*(kmax+10);
-  wrk  = Calloc(lwrk, double);
+  ldwrk = kmax*(kmax+10);
+  dwrk  = Calloc(ldwrk, double);
+  lwrk = m*(kmax+10);
+  wrk  = Calloc(lwrk, Rcomplex);
   eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, double);
+  evec = Calloc(kmax*m, Rcomplex);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -365,18 +309,19 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
     for (i = 0; i < computed; ++i)
       eval[i] = REAL(ilambda)[i];
 
-    Memcpy(evec, REAL(iU), computed*m);
+    Memcpy(evec, COMPLEX(iU), computed*m);
   }
 
   /* The Lanczos recurrence is set to start with [1,1,...,1]^T */
   trl_set_iguess(&info, computed, -1, 0, NULL);
 
-  trlan(opfn, &info, m, kmax, eval, evec, m, lwrk, wrk, &param);
+  ztrlan(opfn, &info, m, kmax, eval, evec, m, wrk, lwrk, dwrk, ldwrk, &param);
 
   /* trl_print_info(&info); */
 
   /* Cleanup */
   Free(wrk);
+  Free(dwrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -389,7 +334,7 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
 
   /* Form the result */
   PROTECT(F = allocVector(REALSXP, neig)); rF = REAL(F);
-  PROTECT(U = allocMatrix(REALSXP, m, neig)); rU = REAL(U);
+  PROTECT(U = allocMatrix(CPLXSXP, m, neig)); rU = COMPLEX(U);
 
   for (i = 0; i < neig; ++i) {
     R_len_t idx = info.nec - i - 1;

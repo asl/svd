@@ -25,8 +25,8 @@
 /* Following are the internal subroutines for printing etc used in function
    lanczos_ */
 
-static void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
-                            clock_t clk1) {
+void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
+                     clock_t clk1) {
   clock_t clk2, clk3;
 
   clk2 = clock();
@@ -40,7 +40,7 @@ static void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
   }
 }
 
-static void print_alpha_beta(trl_info * info, char *title, int i,
+void print_alpha_beta(trl_info * info, char *title, int i,
                       double *alpha, double *beta) {
   sprintf(title, " alpha(%d) =", i);
   trl_print_real(info, title, 1, &alpha[i - 1], 1);
@@ -48,7 +48,7 @@ static void print_alpha_beta(trl_info * info, char *title, int i,
   trl_print_real(info, title, 1, &beta[i - 1], 1);
 }
 
-static void print_all_alpha_beta(trl_info * info, char *title, int jnd,
+void print_all_alpha_beta(trl_info * info, char *title, int jnd,
                                  double *alfrot, double *betrot)  {
   sprintf(title, "alfrot(1:%d)..", jnd);
   trl_print_real(info, title, jnd, alfrot, 1);
@@ -56,8 +56,8 @@ static void print_all_alpha_beta(trl_info * info, char *title, int jnd,
   trl_print_real(info, title, jnd, betrot, 1);
 }
 
-static void print_lambda_res(trl_info * info, int jnd, double *lambda,
-                             double *res) {
+void print_lambda_res(trl_info * info, int jnd, double *lambda,
+                      double *res) {
   trl_print_real(info, "Current eigenvalues..", jnd, lambda, 1);
   trl_print_real(info, "Current residual norms..", jnd, res, 1);
 }

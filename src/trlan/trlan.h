@@ -51,8 +51,19 @@ typedef struct strct_trl_info {
     /* subspace is found but not all wanted eigenvalues  */
     /* are computed.                                     */
 
+    /** Floating-point operations count (EXCLUDING MATVEC). */
+    int flop;
+    /** FLOPS used in re-orthogonalization.                */
+    int flop_h;
+    /** FLOPS used in restarting.                          */
+    int flop_r;
+    double rflp;
+    double rflp_h;
+    double rflp_r;
+  
     /* variables to store timing results */
     clock_t clk_rate;		/* system clock rate (SYSTEM_CLOCK)                 */
+    clock_t clk_max;
     clock_t clk_tot;		/* total time spent in TRLAN (in clock ticks)       */
     clock_t clk_op;		/* time in applying the operator (MATVEC)           */
     clock_t clk_orth;		/* time in re-orthogonalization                     */

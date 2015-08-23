@@ -17,7 +17,9 @@ export(
        propack.svd,
        # nuTRLan SVD and eigensolver
        trlan.svd,
-       trlan.eigen)
+       trlan.eigen,
+       ztrlan.svd,
+       ztrlan.eigen)
 
 exportClasses(extmat)
 

@@ -39,6 +39,21 @@ trlan.svd <- function(X, neig = min(m, n),
   .Call("trlan_svd", X, neig, opts, lambda, U);
 }
 
+ztrlan.svd <- function(X, neig = min(m, n),
+                       opts = list(), lambda = NULL, U = NULL) {
+  if (is.matrix(X)) {
+    m <- dim(X)[1]; n <- dim(X)[2];
+    storage.mode(X) <- "complex";
+  } else {
+    stop('unsupported matrix type for SVD')
+  }
+
+  storage.mode(neig) <- "integer"
+  storage.mode(opts) <- "list"
+  
+  .Call("ztrlan_svd", X, neig, opts, lambda, U);
+}
+
 trlan.eigen <- function(X, neig = min(m, n),
                         opts = list(), lambda = NULL, U = NULL) {
   if (is.matrix(X)) {
@@ -57,4 +72,19 @@ trlan.eigen <- function(X, neig = min(m, n),
   storage.mode(opts) <- "list"
   
   .Call("trlan_eigen", X, neig, opts, lambda, U);
+}
+
+ztrlan.eigen <- function(X, neig = min(m, n),
+                         opts = list(), lambda = NULL, U = NULL) {
+  if (is.matrix(X)) {
+    m <- dim(X)[1]; n <- dim(X)[2];
+    storage.mode(X) <- "xomplex";
+  } else {
+    stop('unsupported matrix type for SVD')
+  }
+
+  storage.mode(neig) <- "integer"
+  storage.mode(opts) <- "list"
+  
+  .Call("ztrlan_eigen", X, neig, opts, lambda, U);
 }
