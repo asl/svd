@@ -1,21 +1,19 @@
-\name{svd}
-\alias{trlan.svd}
-\alias{ztrlan.svd}
-\alias{propack.svd}
+\name{eigen}
+\alias{trlan.eigen}
+\alias{ztrlan.eigen}
 
 \title{
-  Generic Singular Value Decomposition of a Matrix
+  Generic Eigendecomposition of a Matrix
 }
 
 \description{
-  Compute the singular-value decomposition of a real or complex
-  rectangular matrix.
+  Compute the set of eigenvalues and eigenvectors decomposition of a
+  real or complex rectangular matrix.
 }
 
 \usage{
-propack.svd(X, neig = min(m, n), opts = list())
-trlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
-ztrlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
+trlan.eigen(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
+ztrlan.eigen(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
 }
 
 \arguments{
@@ -31,27 +29,14 @@ ztrlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
 }
 
 \details{
-  These routines provides an interface to two state-of-art
-  implementations of truncated SVD.
-
-  PROPACK does this via the implicitly restarted Lanczos
-  bidiagonalization with partial reorthogonalization. nu-TRLAN does the
-  thick-restart Lanczos eigendecomposition of cross-product matrix.
+  These routines provides an interface to state-of-art
+  implementation of eigensolver. In particular, nu-TRLAN does the
+  thick-restart Lanczos eigendecomposition of a matrix.
   
   'opts' is a list of different options which can be passed to the
   routines. Note that by default more or less suitable values for these
   options are set by the routines automatically.
 
-  The options for PROPACK are:
-  \describe{
-    \item{kmax}{integer, maximum number of iterations.}
-    \item{dim}{integer, dimension of Krylov subspace.}
-    \item{p}{integer, number of shifts per restart.}
-    \item{maxiter}{integer. maximum number of restarts.}
-    \item{tol}{numeric, tolerance level.}
-    \item{verbose}{logical, if 'TRUE', provide verbose output.}
-  }
-  
   The options for nu-TRLAN are:
   \describe{
     \item{kmax}{integer, maximum number of iterations.}
@@ -63,11 +48,9 @@ ztrlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
 
 \value{
   The returned value is a list with components
-  \item{d}{a vector containing the singular values of 'x'}
-  \item{u}{a matrix whose columns contain the left singular vectors of
+  \item{d}{a vector containing the eigenvalues of 'X'}
+  \item{u}{a matrix whose columns contain the eigenvectors of
     'X'}
-  \item{v}{a matrix whose columns contain the right singular vectors of
-    'X' (only for 'propack.svd')}
 }
 
 \references{
@@ -79,9 +62,6 @@ ztrlan.svd(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
   restart Lanczos method.} Tech. rep., Lawrence Berkeley National
   Laboratory, University of California, One Cyclotron road, Berkeley, California 94720.  
   
-  Larsen, R. M. (1998). \emph{Efficient algorithms for helioseismic inversion.}
-  Ph.D. thesis, University of Aarhus, Denmark.
-
   Korobeynikov, A. (2010) \emph{Computation- and space-efficient implementation of
   SSA.} Statistics and Its Interface, Vol. 3, No. 3, Pp. 257-268
 }

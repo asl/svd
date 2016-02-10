@@ -43,6 +43,10 @@ ematmul(emat, v, transposed = FALSE)
   routines of the package
 }
 
+\value{
+  Object 'extmat' class
+}
+
 \examples{
 \dontrun{
 library(Matrix)
@@ -64,3 +68,5 @@ system.time(v2 <- propack.svd(as.matrix(USCounties), neig = 10))
 #  8.563   0.027   8.590 
 }
 }
+
+\seealso{\code{\linkS4class{extmat}}}
