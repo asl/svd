@@ -12,7 +12,7 @@
 \alias{as.logical,extmat-method}
 \alias{as.matrix,extmat-method}
 \alias{as.numeric,extmat-method}
-\alias{as.vector,extmat,missing-method}
+\alias{as.vector,extmat-method}
 \alias{crossprod,ANY,extmat-method}
 \alias{crossprod,extmat,ANY-method}
 \alias{crossprod,extmat,extmat-method}

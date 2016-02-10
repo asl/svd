@@ -66,28 +66,29 @@ extmat <- function(mul, tmul, nrow, ncol,
 # S4 weirdness
 setClass("extmat", contains = "externalptr")
   
-setMethod("as.matrix", signature(x = "extmat"), function(x) as(x, "matrix"))
-setMethod("as.array",  signature(x = "extmat"), function(x) as(x, "matrix"))
+setMethod("as.matrix", "extmat",
+          function(x) as(x, "matrix"))
+setMethod("as.array",  "extmat", function(x) as(x, "matrix"))
 as.array.extmat <- as.matrix.extmat <- function(x, ...) as(x, "matrix")
 
-setMethod("as.vector", signature(x = "extmat", mode = "missing"),
+setMethod("as.vector", "extmat",
           function(x, mode) as.vector(as(x, "matrix"), mode))
 as.vector.extmat <- function(x, mode) as.vector(as(x, "matrix"), mode)
 
-setMethod("as.numeric", signature(x = "extmat"),
+setMethod("as.numeric", "extmat",
           function(x, ...) as.numeric(as.vector(x)))
-setMethod("as.integer", signature(x = "extmat"),
+setMethod("as.integer", "extmat",
           function(x, ...) as.integer(as.vector(x)))
-setMethod("as.logical", signature(x = "extmat"),
+setMethod("as.logical", "extmat",
           function(x, ...) as.logical(as.vector(x)))
 
 setAs("extmat", "matrix", function(from) from %*% diag(nrow = ncol(from)))
 
-setMethod("dim", signature(x = "extmat"),
+setMethod("dim", "extmat",
           function(x) c(.extmat.nrow(x@.xData), .extmat.ncol(x@.xData)), valueClass = "integer")
 setMethod("length", "extmat", function(x) prod(dim(x)))
 
-setMethod("t", signature(x = "extmat"),
+setMethod("t", "extmat",
           function(x) {
             emat <- x@.xData
 
