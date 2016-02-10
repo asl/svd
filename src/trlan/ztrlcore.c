@@ -29,6 +29,15 @@
 #include "ztrl_comm_i.h"
 #include "ztrlan_i.h"
 
+void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
+                     clock_t clk1);
+void print_alpha_beta(trl_info * info, char *title, int i,
+                      double *alpha, double *beta);
+void print_all_alpha_beta(trl_info * info, char *title, int jnd,
+                          double *alfrot, double *betrot);
+void print_lambda_res(trl_info * info, int jnd, double *lambda,
+                      double *res);
+
 #define TUNED 0
 // 0: no tuning is applied
 // 1: checking for info->verbose is omitted
