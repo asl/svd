@@ -78,7 +78,7 @@ ztrlan.eigen <- function(X, neig = min(m, n),
                          opts = list(), lambda = NULL, U = NULL) {
   if (is.matrix(X)) {
     m <- dim(X)[1]; n <- dim(X)[2];
-    storage.mode(X) <- "xomplex";
+    storage.mode(X) <- "complex";
   } else {
     stop('unsupported matrix type for SVD')
   }
