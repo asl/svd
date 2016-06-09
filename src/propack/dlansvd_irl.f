@@ -301,9 +301,6 @@ c     | Test if an invariant subspace have been found |
 c     %-----------------------------------------------%
          if (ierr.lt.0) then
             if (dim.lt.k) then
-               call intpr
-     $              ("WARNING: Invariant subspace found. Dimension = ",
-     $              -1, dim, 1)
                info = dim
             endif
             goto 50
