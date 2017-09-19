@@ -45,7 +45,7 @@ is.extmat <- function(X)
 ematmul <- function(emat, v, transposed = FALSE) {
   storage.mode(v) <- "double";
   storage.mode(transposed) <- "logical";
-  .Call("ematmul", emat@.xData, v, transposed);
+  .Call("ematmul_", emat@.xData, v, transposed);
 }
 
 .ematmul <- function(emat, v, transposed = FALSE) {

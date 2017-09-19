@@ -1,4 +1,4 @@
-useDynLib(svd)
+useDynLib(svd, .registration = TRUE)
 
 importFrom("methods",
            as, is, extends, new,

@@ -14,7 +14,7 @@ TRLAN_OBJS=trlan/dsort2.o trlan/dstqrb.o 				\
            trlan/ztrlaux.o trlan/zdaxpy.o trlan/zdgemv.o		\
 	   trlan/trlan_R.o trlan/ztrlan_R.o
 
-SVD_OBJS=extmat.o 
+SVD_OBJS=extmat.o svd_init.o
 
 OBJECTS=$(SVD_OBJS) $(PROPACK_OBJS) $(TRLAN_OBJS)
 

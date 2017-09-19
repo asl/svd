@@ -272,12 +272,3 @@ SEXP extmat_ncol(SEXP ptr) {
 
   return ans;
 }
-
-void R_init_svd(DllInfo *info) {
-  (void)info;
-
-  R_RegisterCCallable("svd", "is_extmat",   (DL_FUNC)is_extmat);
-  R_RegisterCCallable("svd", "extmat_nrow", (DL_FUNC)extmat_nrow);
-  R_RegisterCCallable("svd", "extmat_ncol", (DL_FUNC)extmat_ncol);
-  R_RegisterCCallable("svd", "ematmul",     (DL_FUNC)ematmul);
-}
