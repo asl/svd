@@ -119,7 +119,7 @@ static void rextmat_finalizer(SEXP ptr) {
 SEXP initialize_rextmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   ext_matrix *e;
   rext_matrix *re;
-  SEXP emat;
+  SEXP emat, lf, ltf;
 
   /* Allocate memory */
   re = Calloc(1, rext_matrix);
@@ -141,13 +141,15 @@ SEXP initialize_rextmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   PROTECT(emat = R_MakeExternalPtr(e, install("external matrix"), R_NilValue));
 
   /* Attach the fields */
-  PROTECT(re->fcall = R_MakeWeakRef(emat, lang2(f, R_NilValue), R_NilValue, 1));
-  PROTECT(re->tfcall = R_MakeWeakRef(emat, lang2(tf, R_NilValue), R_NilValue, 1));
+  PROTECT(lf = lang2(f, R_NilValue));
+  PROTECT(ltf = lang2(tf, R_NilValue));
+  PROTECT(re->fcall = R_MakeWeakRef(emat, lf, R_NilValue, 1));
+  PROTECT(re->tfcall = R_MakeWeakRef(emat, ltf, R_NilValue, 1));
   PROTECT(re->rho = R_MakeWeakRef(emat, rho, R_NilValue, 1));
 
   R_RegisterCFinalizer(emat, rextmat_finalizer);
 
-  UNPROTECT(4);
+  UNPROTECT(6);
 
   return emat;
 }
