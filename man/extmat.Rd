@@ -71,9 +71,7 @@ system.time(v2 <- propack.svd(as.matrix(USCounties), neig = 10))
 # The largest eigenvalue and the corresponding eigenvector of a Hilbert matrix
 h <- outer(1:5000, 1:5000, function(i, j) 1 / (i + j - 1))
 v1 <- trlan.eigen(h, neig = 1)
-# Same, but using complex numbers
-v2 <- ztrlan.eigen(h, neig = 1)
-print(c(v1$d, v2$d))
+print(v1$d)
 }
 
 \seealso{\code{\linkS4class{extmat}}}

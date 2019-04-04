@@ -18,8 +18,7 @@ export(
        # nuTRLan SVD and eigensolver
        trlan.svd,
        trlan.eigen,
-       ztrlan.svd,
-       ztrlan.eigen)
+       ztrlan.svd)
 
 exportClasses(extmat)
 

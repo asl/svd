@@ -1,6 +1,5 @@
 \name{eigen}
 \alias{trlan.eigen}
-\alias{ztrlan.eigen}
 
 \title{
   Generic Eigendecomposition of a Matrix
@@ -8,12 +7,11 @@
 
 \description{
   Compute the set of eigenvalues and eigenvectors decomposition of a
-  real or complex rectangular matrix.
+  real rectangular matrix.
 }
 
 \usage{
 trlan.eigen(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
-ztrlan.eigen(X, neig = min(m, n), opts = list(), lambda = NULL, U = NULL)
 }
 
 \arguments{
