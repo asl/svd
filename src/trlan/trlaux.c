@@ -25,7 +25,7 @@ int close_file(FILE * fp, int err1, int err2) {
 void trl_open_logfile(trl_info * info) {
   char filename[TRLAN_STRING_LEN];
 
-  if (info->log_file != 0 && strlen(info->log_file) > 0) {
+  if (strlen(info->log_file) > 0) {
     trl_pe_filename(TRLAN_STRING_LEN, filename, info->log_file, info->my_pe,
                     info->npes);
     info->log_fp = fopen(filename, "w");
@@ -38,7 +38,7 @@ void trl_reopen_logfile(trl_info * info)
 {
   char filename[TRLAN_STRING_LEN];
 
-  if (info->log_file != 0 && strlen(info->log_file) > 0) {
+  if (strlen(info->log_file) > 0) {
     trl_pe_filename(TRLAN_STRING_LEN, filename, info->log_file, info->my_pe,
                      info->npes);
     info->log_fp = fopen(filename, "a");
@@ -59,7 +59,7 @@ void trl_open_cptfile(trl_info * info)
 {
   char filename[TRLAN_STRING_LEN];
 
-  if (info->cpfile != 0 && strlen(info->cpfile) > 0) {
+  if (strlen(info->cpfile) > 0) {
     trl_pe_filename(TRLAN_STRING_LEN, filename, info->cpfile, info->my_pe,
                     info->npes);
     info->cpt_fp = fopen(filename, "w");

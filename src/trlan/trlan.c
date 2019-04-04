@@ -168,7 +168,7 @@ void trl_print_setup(trl_info * info, int lbas, int lmis, int lwrk)
               "TRLAN generates a random starting vector.\n");
     else
       Rprintf("TRLAN generates a random starting vector.\n");
-  } else if (info->oldcpf == 0 || strlen(info->oldcpf) == 0) {
+  } else if (strlen(info->oldcpf) == 0) {
     if (info->log_fp)
       fprintf(info->log_fp,
               "Restarting with existing checkpoint files %s ####\n",

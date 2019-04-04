@@ -980,7 +980,7 @@ void trl_initial_guess(int nrow, double *evec, int lde, int mev,
   if (info->guess > 1) {
     // retrieve a check-point file
     i = info->cpio;
-    if (info->oldcpf != 0 && strlen(info->oldcpf) > 0) {
+    if (strlen(info->oldcpf) > 0) {
       trl_pe_filename(TRLAN_STRING_LEN, file, info->oldcpf, info->my_pe,
                       info->npes);
     } else {
@@ -1639,7 +1639,7 @@ void trl_set_locking(int jnd, int nlam, double *lambda, double *res,
   eps = DBL_EPSILON;
   i = 0;
   j = nlam - 1;
-  ti = (fabs(1) <= small(2, 1));
+  ti = (fabs(1.0f) <= small(2.0f, 1.0f));
   ti = (fabs(res[i]) <= small(lambda[i], eps));
   tj = (fabs(res[j]) <= small(lambda[j], eps));
   while (i < j) {

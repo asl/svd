@@ -1415,7 +1415,7 @@ void ztrl_initial_guess(int nrow, trl_dcomplex * evec, int lde, int mev,
     if (info->guess > 1) {
 	// retrieve a check-point file
 	i = info->cpio;
-	if (info->oldcpf != 0 && strlen(info->oldcpf) > 0) {
+	if (strlen(info->oldcpf) > 0) {
 	    trl_pe_filename(TRLAN_STRING_LEN, file, info->oldcpf, info->my_pe,
 			     info->npes);
 	} else {
