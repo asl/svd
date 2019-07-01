@@ -52,30 +52,18 @@ void F77_NAME(dlansvd_irl_largest) (int *m, int *n,
                                     double *dparm, int *iparm);
 
 
-void F77_SUB(printint0)(char* label, int* nc, int* d) {
+void printint0(char* label, int d) {
   int i;
 
-  for (i = 0; i < *nc; ++i)
-    Rprintf("%c", label[i]);
-
-  Rprintf("\t%d\n", *d);
+  Rprintf("%s\t%d\n", label, d, d);
 }
 
-void F77_SUB(printdbl0)(char* label, int* nc, double* d) {
-  int i;
-
-  for (i = 0; i < *nc; ++i)
-    Rprintf("%c", label[i]);
-
-  Rprintf("\t%lf\n", *d);
+void printdbl0(char* label, double d) {
+  Rprintf("%s\t%lf\n", label, d);
 }
 
-void F77_SUB(printchar0)(char* label, int* nc) {
-  int i;
-  for (i = 0; i < *nc; ++i)
-    Rprintf("%c", label[i]);
-
-  Rprintf("\n");
+void printchar0(char* label) {
+  Rprintf("%s\n", label);
 }
 
 #define UNUSED(x) (void)(x)
