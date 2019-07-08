@@ -1232,13 +1232,13 @@ void trl_tridiag(int nd, double *alpha, double *beta, double *rot,
      generate the rotation matrix */
   F77_CALL(dsytrd)(&upper, &nd,
                    rot, &nd, alfrot, betrot,
-                   wrk, &wrk[nd], &lwrk2, ierr);
+                   wrk, &wrk[nd], &lwrk2, ierr, 1);
   if (*ierr != 0) {
     *ierr = -112;
     return;
   }
   betrot[nd - 1] = beta[nd - 1];
-  F77_CALL(dorgtr)(&upper, &nd, rot, &nd, wrk, &wrk[nd], &lwrk2, ierr);
+  F77_CALL(dorgtr)(&upper, &nd, rot, &nd, wrk, &wrk[nd], &lwrk2, ierr, 1);
   if (*ierr != 0) {
     *ierr = -113;
     return;
@@ -1533,7 +1533,7 @@ void trl_get_tvec_a(int nd, int kept, double *alpha, double *beta,
     yy[(i + 1) * (nd + 1) - 1] = beta[i];
   }
 
-  F77_CALL(dsyev)(&job, &upl, &nd, yy, &nd, alpha, wrk, &lwrk, ierr);
+  F77_CALL(dsyev)(&job, &upl, &nd, yy, &nd, alpha, wrk, &lwrk, ierr, 1, 1);
 
   if (*ierr != 0)
     error("Error from dsyev: %d.\n", *ierr);

@@ -294,7 +294,7 @@ trl_ritz_projection(trl_matprod op,
   trl_g_sum(info->mpicom, nsqr, rvv, wrk2);
 
   /* step (2) : Choleskey factorization of G */
-  F77_CALL(dpotrf)(&upper, &nev, rvv, &nev, &ierr);
+  F77_CALL(dpotrf)(&upper, &nev, rvv, &nev, &ierr, 1);
   if (ierr != 0) {
     info->stat = -234;
     goto end;
@@ -317,7 +317,7 @@ trl_ritz_projection(trl_matprod op,
   /* compute solution of R^T H_2 = H_1 */
   F77_CALL(dtrtrs)(&upper, &trans, &notrans,
                    &nev, &nev, rvv, &nev, wrk2, &nev,
-                   &ierr);
+                   &ierr, 1, 1, 1);
   if (ierr != 0) {
     info->stat = -235;
     goto end;
@@ -330,13 +330,13 @@ trl_ritz_projection(trl_matprod op,
   }
   F77_CALL(dtrtrs)(&upper, &trans, &notrans,
                    &nev, &nev, rvv, &nev, uau, &nev,
-                   &ierr);
+                   &ierr, 1, 1, 1);
   if (ierr != 0) {
     info->stat = -236;
     goto end;
   }
   /* solve the small symmetric eigenvalue problem */
-  F77_CALL(dsyev)(&job, &upper, &nev, uau, &nev, eres, wrk2, &nsqr, &ierr);
+  F77_CALL(dsyev)(&job, &upper, &nev, uau, &nev, eres, wrk2, &nsqr, &ierr, 1, 1);
   if (ierr != 0) {
     info->stat = -237;
     goto end;
@@ -344,7 +344,7 @@ trl_ritz_projection(trl_matprod op,
   /* solve R Y = Y to prepare for multiplying with V */
   F77_CALL(dtrtrs)(&upper, &notrans, &notrans,
                    &nev, &nev, rvv, &nev, uau, &nev,
-                   &ierr);
+                   &ierr, 1, 1, 1);
   if (ierr != 0) {
     info->stat = -238;
     goto end;

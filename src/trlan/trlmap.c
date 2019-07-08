@@ -20,7 +20,7 @@ void trl_dcopy(int n, double *dx, int incx, double *dy, int incy) {
 
 void trl_dgemv(char *trans, int m, int n, double alpha, double *a, int lda,
                double *x, int incx, double beta, double *y, int incy) {
-  F77_CALL(dgemv)(trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+  F77_CALL(dgemv)(trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy, 1);
 }
 
 void trl_daxpy(int n, double da, double *dx, int incx, double *dy,
@@ -33,7 +33,7 @@ void trl_dgemm(char *transa, char *transb, int m, int n, int k,
                double beta, double *c, int ldc) {
   F77_CALL(dgemm)(transa, transb,
                   &m, &n, &k,
-                  &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+                  &alpha, a, &lda, b, &ldb, &beta, c, &ldc, 1, 1);
 }
 
 void trl_dscal(int n, double da, double *dx, int incx) {
@@ -48,7 +48,7 @@ void trl_zaxpy(int n, trl_dcomplex za, trl_dcomplex * zx, int incx,
 void trl_zgemv(char *trans, int m, int n, trl_dcomplex alpha,
                trl_dcomplex * a, int lda, trl_dcomplex * x, int incx,
                trl_dcomplex beta, trl_dcomplex * y, int incy) {
-  F77_CALL(zgemv)(trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+  F77_CALL(zgemv)(trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy, 1);
 }
 
 void trl_zgemm(char *transa, char *transb, int m, int n, int k,
@@ -57,7 +57,7 @@ void trl_zgemm(char *transa, char *transb, int m, int n, int k,
 	       trl_dcomplex * c, int ldc) {
   F77_CALL(zgemm)(transa, transb,
                   &m, &n, &k,
-                  &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+                  &alpha, a, &lda, b, &ldb, &beta, c, &ldc, 1, 1);
 }
 
 void trl_zscal(int n, trl_dcomplex za, trl_dcomplex * zx, int incx) {

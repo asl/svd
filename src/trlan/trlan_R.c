@@ -100,9 +100,9 @@ static void dense_op(int *pnrow, int *pncol,
 
   for (i = 0; i < ncol; ++i) {
     F77_CALL(dgemv)(&transt, &m, &n, &one, A, &m,
-                    xin+i*ldx, &i1, &zero, tmp, &i1);
+                    xin+i*ldx, &i1, &zero, tmp, &i1, 1);
     F77_CALL(dgemv)(&transn, &m, &n, &one, A, &m,
-                    tmp, &i1, &zero, yout+i*ldy, &i1);
+                    tmp, &i1, &zero, yout+i*ldy, &i1, 1);
   }
 }
 
@@ -121,7 +121,7 @@ static void dense_op_eigen(int *pnrow, int *pncol,
 
   for (i = 0; i < ncol; ++i)
     F77_CALL(dgemv)(&transn, &m, &n, &one, A, &m,
-                    xin+i*ldx, &i1, &zero, yout+i*ldy, &i1);
+                    xin+i*ldx, &i1, &zero, yout+i*ldy, &i1, 1);
 }
 
 /* Get the list element named str, or return NULL */

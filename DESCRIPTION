@@ -1,6 +1,7 @@
 Package: svd
 Type: Package
 Imports: methods
+Requires: R (>= 3.7)
 Suggests: testthat (>= 0.7)
 Title: Interfaces to Various State-of-Art SVD and Eigensolvers
 Version: 0.4.4

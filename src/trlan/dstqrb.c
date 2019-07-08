@@ -69,11 +69,11 @@ int dstqrb(int n, double * d__, double * e,
 
 /*	Determine the unit roundoff and over/underflow thresholds. */
 
-  eps = F77_CALL(dlamch)("E");
+  eps = F77_CALL(dlamch)("E", 1);
 /*	Computing 2nd power */
   d__1 = eps;
   eps2 = d__1 * d__1;
-  safmin = F77_CALL(dlamch)("S");
+  safmin = F77_CALL(dlamch)("S", 1);
   safmax = 1. / safmin;
   ssfmax = sqrt(safmax) / 3.;
   ssfmin = sqrt(safmin) / eps2;
@@ -133,7 +133,7 @@ L30:
 
   /*	Scale submatrix in rows and columns L to LEND */
   i__1 = lend - l + 1;
-  anorm = F77_CALL(dlanst)("I", &i__1, &d__[l], &e[l]);
+  anorm = F77_CALL(dlanst)("I", &i__1, &d__[l], &e[l], 1);
   iscale = 0;
   if (anorm == 0.) {
     goto L10;
@@ -142,18 +142,18 @@ L30:
     iscale = 1;
     i__1 = lend - l + 1;
     F77_CALL(dlascl)("G", &c__0, &c__0, &anorm, &ssfmax,
-                     &i__1, &c__1, &d__[l], &n, info);
+                     &i__1, &c__1, &d__[l], &n, info, 1);
     i__1 = lend - l;
     F77_CALL(dlascl)("G", &c__0, &c__0, &anorm, &ssfmax,
-                     &i__1, &c__1, &e[l], &n, info);
+                     &i__1, &c__1, &e[l], &n, info, 1);
   } else if (anorm < ssfmin) {
     iscale = 2;
     i__1 = lend - l + 1;
     F77_CALL(dlascl)("G", &c__0, &c__0, &anorm, &ssfmin,
-                     &i__1, &c__1, &d__[l], &n, info);
+                     &i__1, &c__1, &d__[l], &n, info, 1);
     i__1 = lend - l;
     F77_CALL(dlascl)("G", &c__0, &c__0, &anorm, &ssfmin,
-                     &i__1, &c__1, &e[l], &n, info);
+                     &i__1, &c__1, &e[l], &n, info, 1);
   }
 
 /*	Choose between QL and QR iteration */
@@ -264,7 +264,7 @@ L30:
 
     mm = m - l + 1;
     F77_CALL(dlasr)("R", "V", "B", &c__1, &mm, &work[l], &work[n - 1 + l],
-                    &z__[l], &c__1);
+                    &z__[l], &c__1, 1, 1, 1);
 
     d__[l] -= p;
     e[l] = g;
@@ -375,7 +375,7 @@ L30:
     /* If eigenvectors are desired, then apply saved rotations. */
     mm = l - m + 1;
     F77_CALL(dlasr)("R", "V", "F", &c__1, &mm, &work[m], &work[n - 1 + m],
-                    &z__[m], &c__1);
+                    &z__[m], &c__1, 1, 1, 1);
 
     d__[l] -= p;
     e[lm1] = g;
@@ -398,17 +398,17 @@ L140:
   if (iscale == 1) {
     i__1 = lendsv - lsv + 1;
     F77_CALL(dlascl)("G", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1,
-                     &d__[lsv], &n, info);
+                     &d__[lsv], &n, info, 1);
     i__1 = lendsv - lsv;
     F77_CALL(dlascl)("G", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1, &e[lsv],
-                     &n, info);
+                     &n, info, 1);
   } else if (iscale == 2) {
     i__1 = lendsv - lsv + 1;
     F77_CALL(dlascl)("G", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1,
-                     &d__[lsv], &n, info);
+                     &d__[lsv], &n, info, 1);
     i__1 = lendsv - lsv;
     F77_CALL(dlascl)("G", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1, &e[lsv],
-                     &n, info);
+                     &n, info, 1);
   }
 
   /* Check for no convergence to an eigenvalue after a total

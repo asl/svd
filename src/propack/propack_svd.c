@@ -78,7 +78,7 @@ static void dense_matmul(char *transa,
   /* Silence an 'unused' warning */
   UNUSED(iparm);
 
-  F77_CALL(dgemv)(transa, m, n, &one, dparm, m, x, &i1, &zero, y, &i1);
+  F77_CALL(dgemv)(transa, m, n, &one, dparm, m, x, &i1, &zero, y, &i1, 1 /* length of transa */);
 }
 
 /* Hankel matrix-vector product routine */
