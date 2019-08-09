@@ -26,6 +26,10 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Complex.h>
 
+#ifndef FCONE
+# define FCONE
+#endif
+
 #include "extmat.h"
 #include "ztrlan.h"
 
@@ -53,9 +57,9 @@ static void dense_op(int *pnrow, int *pncol,
 
   for (i = 0; i < ncol; ++i) {
     F77_CALL(zgemv)(&transt, &m, &n, &one, A, &m,
-                    xin+i*ldx, &i1, &zero, tmp, &i1, 1);
+                    xin+i*ldx, &i1, &zero, tmp, &i1 FCONE);
     F77_CALL(zgemv)(&transn, &m, &n, &one, A, &m,
-                    tmp, &i1, &zero, yout+i*ldy, &i1, 1);
+                    tmp, &i1, &zero, yout+i*ldy, &i1 FCONE);
   }
 }
 
@@ -74,7 +78,7 @@ static void dense_op_eigen(int *pnrow, int *pncol,
 
   for (i = 0; i < ncol; ++i)
     F77_CALL(zgemv)(&transn, &m, &n, &one, A, &m,
-                    xin+i*ldx, &i1, &zero, yout+i*ldy, &i1, 1);
+                    xin+i*ldx, &i1, &zero, yout+i*ldy, &i1 FCONE);
 }
 
 /* Get the list element named str, or return NULL */

@@ -19,11 +19,16 @@
  *   MA 02139, USA.
  */
 
+
 #include <R.h>
 #include <Rmath.h>
 #include <Rdefines.h>
 #include <R_ext/Utils.h>
 #include <R_ext/BLAS.h>
+
+#ifndef FCONE
+# define FCONE
+#endif
 
 #include "extmat.h"
 
@@ -78,7 +83,7 @@ static void dense_matmul(char *transa,
   /* Silence an 'unused' warning */
   UNUSED(iparm);
 
-  F77_CALL(dgemv)(transa, m, n, &one, dparm, m, x, &i1, &zero, y, &i1, 1 /* length of transa */);
+  F77_CALL(dgemv)(transa, m, n, &one, dparm, m, x, &i1, &zero, y, &i1 FCONE /* length of transa */);
 }
 
 /* Hankel matrix-vector product routine */
