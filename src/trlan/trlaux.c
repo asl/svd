@@ -639,7 +639,7 @@ void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
                      int npe) {
   int lead, ndig, off;
   size_t len;
-  char *format;
+  char *format, *tfilename;
 
   ndig = 1;
   lead = npe;
@@ -653,14 +653,15 @@ void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
     error("error: not enough space for filename (%d+%d chars).\n",
           len, ndig);
 
-  memset(filename, 0, nlen * sizeof(char));
-  strncpy(filename, base, len);
+  tfilename = Calloc(nlen, char);
+  strncpy(tfilename, base, len);
   off = 1 + ndig % 10;
   off = 5 + 2 * off;
   format = Calloc(off, char);
   sprintf(format, "%%s%%0%d.%dd", ndig, ndig);
-  sprintf(filename, format, filename, my_rank);
+  sprintf(filename, format, tfilename, my_rank);
   Free(format);
+  Free(tfilename);
   return;
 }
 
