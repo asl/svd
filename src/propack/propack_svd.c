@@ -177,10 +177,10 @@ SEXP propack_svd(SEXP A, SEXP ne, SEXP opts) {
   getScalarListElement(verbose, opts, "verbose", asLogical, 0);
 
   /* Level of orthogonality to maintain among Lanczos vectors. */
-  doption[0] = sqrt(DOUBLE_EPS);
+  doption[0] = sqrt(DBL_EPSILON);
   /* During reorthogonalization, all vectors with with components larger than
      this value along the latest Lanczos vector c will be purged. */
-  doption[1] = pow(DOUBLE_EPS, 3.0/4.0);
+  doption[1] = pow(DBL_EPSILON, 3.0/4.0);
   /* Estimate of || A ||. */
   doption[2] = 0.0;
   /* Smallest relgap between any shift the smallest requested Ritz value. */

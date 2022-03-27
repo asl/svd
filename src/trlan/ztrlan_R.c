@@ -142,7 +142,7 @@ SEXP ztrlan_svd(SEXP A, SEXP ne, SEXP opts,
   kmax = imin2(kmax, m+1);
 
   /* Tolerance */
-  getScalarListElement(tol, opts, "tol", asReal, sqrt(DOUBLE_EPS));
+  getScalarListElement(tol, opts, "tol", asReal, sqrt(DBL_EPSILON));
 
   /* Maximum number of matrix-vector products */
   getScalarListElement(maxiter, opts, "maxiter", asInteger, neig*m);
@@ -269,7 +269,7 @@ SEXP ztrlan_eigen(SEXP A, SEXP ne, SEXP opts,
   kmax = imin2(kmax, m+1);
 
   /* Tolerance */
-  getScalarListElement(tol, opts, "tol", asReal, sqrt(DOUBLE_EPS));
+  getScalarListElement(tol, opts, "tol", asReal, sqrt(DBL_EPSILON));
 
   /* Maximum number of matrix-vector products */
   getScalarListElement(maxiter, opts, "maxiter", asInteger, neig*m);
