@@ -14,6 +14,8 @@
 #include <float.h>
 #include <time.h>
 #include <string.h>
+#include <limits.h>
+
 //
 // ..
 // .. internal libraries ..

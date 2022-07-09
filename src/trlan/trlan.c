@@ -17,6 +17,8 @@
 #include "trlaux_i.h"
 #include "trl_comm_i.h"
 
+#include <limits.h>
+
 void trl_clear_counter(trl_info * info, int nrow, int mev, int lde) {
   int ntmp;
 

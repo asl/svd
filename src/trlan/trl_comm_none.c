@@ -16,6 +16,8 @@
 #include "trlan_i.h"
 #include "trl_comm_i.h"
 
+#include <limits.h>
+
 void trl_init_info(trl_info * info, int nrow, int mxlan, int lohi,
                    int ned, double tol, int restart, int maxmv,
                    int mpicom) {

@@ -9,4 +9,4 @@ Maintainer: Anton Korobeynikov <anton@korobeynikov.info>
 Description: R bindings to SVD and eigensolvers (PROPACK, nuTRLan).
 License: BSD_3_clause + file LICENSE
 Copyright: see file COPYRIGHTS
-URL: http://github.com/asl/svd
+URL: https://github.com/asl/svd

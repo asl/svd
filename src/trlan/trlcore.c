@@ -13,6 +13,7 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 
 #ifndef FCONE
 # define FCONE
