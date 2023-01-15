@@ -658,8 +658,8 @@ void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
   off = 1 + ndig % 10;
   off = 5 + 2 * off;
   format = Calloc(off, char);
-  sprintf(format, "%%s%%0%d.%dd", ndig, ndig);
-  sprintf(filename, format, tfilename, my_rank);
+  snprintf(format, off, "%%s%%0%d.%dd", ndig, ndig);
+  snprintf(filename, nlen, format, tfilename, my_rank);
   Free(format);
   Free(tfilename);
   return;

@@ -47,17 +47,17 @@ void add_clock_ticks(trl_info * info, clock_t *time, double *rtime,
 
 void print_alpha_beta(trl_info * info, char *title, int i,
                       double *alpha, double *beta) {
-  sprintf(title, " alpha(%d) =", i);
+  snprintf(title, TRLAN_STRING_LEN, " alpha(%d) =", i);
   trl_print_real(info, title, 1, &alpha[i - 1], 1);
-  sprintf(title, "  beta(%d) =", i);
+  snprintf(title, TRLAN_STRING_LEN, "  beta(%d) =", i);
   trl_print_real(info, title, 1, &beta[i - 1], 1);
 }
 
 void print_all_alpha_beta(trl_info * info, char *title, int jnd,
                                  double *alfrot, double *betrot)  {
-  sprintf(title, "alfrot(1:%d)..", jnd);
+  snprintf(title, TRLAN_STRING_LEN, "alfrot(1:%d)..", jnd);
   trl_print_real(info, title, jnd, alfrot, 1);
-  sprintf(title, "betrot(1:%d)..", jnd);
+  snprintf(title, TRLAN_STRING_LEN, "betrot(1:%d)..", jnd);
   trl_print_real(info, title, jnd, betrot, 1);
 }
 
@@ -100,20 +100,20 @@ void print_restart_state(trl_info * info, char *title, int nrow,
                    1);
       }
       wrk2[j1] = wrk2[j1] - 1;
-      sprintf(title, "Orthogonality level of y(%d) ..", j1 + 1);
+      snprintf(title, TRLAN_STRING_LEN, "Orthogonality level of y(%d) ..", j1 + 1);
       trl_print_real(info, title, j1 + 1, wrk2, 1);
     }
   }
   if (info->verbose > 10) {
     for (j1 = 0; j1 < imin2(kept, info->verbose); j1++) {
-      sprintf(title, "eigenvector %d of Q'AQ ..", j1);
+      snprintf(title, TRLAN_STRING_LEN, "eigenvector %d of Q'AQ ..", j1);
       trl_print_real(info, title, jml, &yy[(j1 - 1) * jml], 1);
     }
   }
   if (info->verbose > 10) {
     int j1n = imin2(nrow, info->verbose);
     for (j1 = 0; j1 < imin2(kept + locked, mev); j1++) {
-      sprintf(title, "Ritz vector %d (1:%d) ..", j1, j1n);
+      snprintf(title, TRLAN_STRING_LEN, "Ritz vector %d (1:%d) ..", j1, j1n);
       trl_print_real(info, title, j1n, &evec[j1 * nrow], 1);
     }
   }
@@ -133,14 +133,14 @@ void print_final_state(trl_info * info, char *title, int nrow, int mev,
   }
   if (info->verbose > 8) {
     for (j1 = 0; j1 < imin2(kept, info->verbose); j1++) {
-      sprintf(title, "Eigenvector %d of Q''AQ ..", j1);
+      snprintf(title, TRLAN_STRING_LEN, "Eigenvector %d of Q''AQ ..", j1);
       trl_print_real(info, title, jml, &yy[j1 * jml], 1);
     }
   }
   if (info->verbose > 10) {
     int j1n = imin2(nrow, info->verbose);
     for (j1 = 0; j1 < imin2(kept, mev); j1++) {
-      sprintf(title, "Ritz vector %d (1:%d) ..", j1, j1n);
+      snprintf(title, TRLAN_STRING_LEN, "Ritz vector %d (1:%d) ..", j1, j1n);
       trl_print_real(info, title, j1n, &evec[j1 * nrow], 1);
     }
   }
@@ -193,37 +193,37 @@ void log_error_state(trl_info * info, int kept, int j1, int j2, int jnd,
   strcpy(title, "Content of eval ..");
   trl_print_real(info, title, mev, eval, 1);
   if (jnd > 0) {
-    sprintf(title, "Alpha(1:%d) .. ", jnd);
+    snprintf(title, TRLAN_STRING_LEN, "Alpha(1:%d) .. ", jnd);
     trl_print_real(info, title, jnd, alpha, 1);
-    sprintf(title, " Beta(1:%d) .. ", jnd);
+    snprintf(title, TRLAN_STRING_LEN, " Beta(1:%d) .. ", jnd);
     trl_print_real(info, title, jnd, beta, 1);
-    sprintf(title, "Alfrot(1:%d) .. ", jnd);
+    snprintf(title, TRLAN_STRING_LEN, "Alfrot(1:%d) .. ", jnd);
     trl_print_real(info, title, jnd, alfrot, 1);
-    sprintf(title, "betrot(1:%d) .. ", jnd);
+    snprintf(title, TRLAN_STRING_LEN, "betrot(1:%d) .. ", jnd);
     trl_print_real(info, title, jnd, betrot, 1);
   }
   if (j1 > 0) {
     strcpy(title, "the First row of evec ..");
     trl_print_real(info, title, j1, evec, nrow);
-    sprintf(title, "row %d of evec ..", nrow);
+    snprintf(title, TRLAN_STRING_LEN, "row %d of evec ..", nrow);
     trl_print_real(info, title, j1, &evec[nrow - 1], nrow);
   }
   if (j2 > 0) {
     strcpy(title, "the First row of base ..");
     trl_print_real(info, title, j2, base, nrow);
-    sprintf(title, "row %d of base ..", nrow);
+    snprintf(title, TRLAN_STRING_LEN, "row %d of base ..", nrow);
     trl_print_real(info, title, j2, &base[nrow - 1], nrow);
   }
   if (qb != NULL) {
-    sprintf(title, "Content of qb (q_%d) ..", jnd - 1);
+    snprintf(title, TRLAN_STRING_LEN, "Content of qb (q_%d) ..", jnd - 1);
     trl_print_real(info, title, nrow, qb, 1);
   }
   if (qa != NULL) {
-    sprintf(title, "Content of qa (q_%d) ..", jnd);
+    snprintf(title, TRLAN_STRING_LEN, "Content of qa (q_%d) ..", jnd);
     trl_print_real(info, title, nrow, qa, 1);
   }
   if (rr != NULL) {
-    sprintf(title, "Content of rr (residual == q_%d) ..", jnd + 1);
+    snprintf(title, TRLAN_STRING_LEN, "Content of rr (residual == q_%d) ..", jnd + 1);
     trl_print_real(info, title, nrow, rr, 1);
   }
   if (info->my_pe == 0 && info->log_fp != NULL) {
