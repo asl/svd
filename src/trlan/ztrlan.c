@@ -425,6 +425,7 @@ ztrl_check_ritz(ztrl_matprod op, trl_info * info, int nrow, int ncol,
       }
 
     } else if (beta != NULL) {
+      icheck = 0;
       for (i = 0; i < ncol; i++) {
         Rprintf("%21.14f    %11.3e%11.3e%11.3e%11.3e\n",
                 alpha[i], res[i], beta[i] - res[i], err[i],
