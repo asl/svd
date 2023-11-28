@@ -1,4 +1,4 @@
 library(testthat)
 library(svd)
 
-test_package("svd")
+test_check("svd")

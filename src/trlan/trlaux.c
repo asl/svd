@@ -650,8 +650,8 @@ void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
   len = indchar(base, ' ') - 1;
 
   if (nlen < len + ndig + 1)
-    error("error: not enough space for filename (%d+%d chars).\n",
-          len, ndig);
+    error("error: not enough space for filename (%u+%u chars).\n",
+          (unsigned)len, ndig);
 
   tfilename = Calloc(nlen, char);
   strncpy(tfilename, base, len);

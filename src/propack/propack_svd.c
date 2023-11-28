@@ -60,7 +60,7 @@ void F77_NAME(dlansvd_irl_largest) (int *m, int *n,
 void printint0(char* label, int d) {
   int i;
 
-  Rprintf("%s\t%d\n", label, d, d);
+  Rprintf("%s\t%d\n", label, d);
 }
 
 void printdbl0(char* label, double d) {
