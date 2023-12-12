@@ -3,8 +3,7 @@ PKG_CFLAGS=-I../inst/include -DUSE_FC_LEN_T
 
 .PHONY: all clean shlib-clean
 
-PROPACK_OBJS=propack/dlansvd_irl.o propack/printstat.o propack/second.o \
-             propack/propack_svd.o
+PROPACK_OBJS=propack/dlansvd_irl.o propack/printstat.o propack/propack_svd.o
 
 TRLAN_OBJS=trlan/dsort2.o trlan/dstqrb.o 				\
            trlan/trlcore.o trlan/trlaux.o 				\

@@ -154,7 +154,7 @@ c-------------------- Here begins executable code ---------------------
 c     %-------------%
 c     | Start timer |
 c     %-------------%
-      call second(t0)
+      call cpu_time(t0)
 
 c     %---------------------------------%
 c     | Set machine dependent constants |
@@ -223,14 +223,14 @@ c     %---------------------------------------------%
          call dcopy(dim, work(ibeta),1,work(ibeta1),1)
          call dzero(dim+1,work(ibnd),1)
 
-         call second(t2)
+         call cpu_time(t2)
          call dbdqr((dim.eq.min(m,n)),'N',dim,work(ialpha1),
      c        work(ibeta1),work(ibnd+dim-1),work(ibnd+dim),
      c        work(ip),dim+1)
 
          call dbdsqr('u',dim,0,1,0,work(ialpha1),work(ibeta1),work,1,
      c        work(ibnd),1,work,1,work(iwrk),lapinfo)
-         call  second(t3)
+         call  cpu_time(t3)
          tbsvd = tbsvd + (t3-t2)
          nbsvd = nbsvd + 1
 
@@ -319,7 +319,7 @@ c     |                                                                     |
 c     | We use exact shifts mu_i for which the relative gap between mu_i    |
 c     | and the lower bound on the k'th Ritzvalue is larger than doption(4) |
 c     %---------------------------------------------------------------------%
-            call second(t2)
+            call cpu_time(t2)
             call dzero(dim-k,work(ishift),1)
             nshft = 0
             if (lsame(which,'s')) then
@@ -395,7 +395,7 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
      c           work(iq),dim,work(iwrk+wst-1),wcnk)
 c$OMP END PARALLEL
             rnorm = work(ibeta+k-1)
-            call second(t3)
+            call cpu_time(t3)
             trestart = trestart + (t3-t2)
             nrestart = nrestart + 1
          endif
@@ -415,7 +415,7 @@ c     %-----------------------------------------%
       endif
       neig = nconv
       nlandim = dim
-      call second(t1)
+      call cpu_time(t1)
       tlansvd = t1-t0
       end
 
@@ -585,7 +585,7 @@ c     %--------------------%
       external dlamch,dlapy2
 
 c-------------------- Here begins executable code ---------------------
-      call second(t1)
+      call cpu_time(t1)
 
 c     %---------------------------------%
 c     | Set machine dependent constants |
@@ -688,10 +688,10 @@ c     %---------------------------------------------------%
          iwork(iidx+2) = k0+1
 
          call dscal(m,rnorm,U(1,k0+1),1)
-         call second(t2)
+         call cpu_time(t2)
          call dreorth(m,k0,U,ldu,U(1,k0+1),rnorm,iwork(iidx),kappa,
      c        work(is),ioption(1))
-         call second(t3)
+         call cpu_time(t3)
          treorthu = treorthu+(t3-t2)
          call dsafescal(m,rnorm,U(1,k0+1))
          call dset_mu(k0,work(imu),iwork(iidx),epsn2)
@@ -733,9 +733,9 @@ c     %-------------------------------------------%
 c     %---------------------------------------------%
 c     | alpha_{j} v_{j} = A'*u_{j} - beta_{j} v_{j} |
 c     %---------------------------------------------%
-         call second(t2)
+         call cpu_time(t2)
          call aprod('t',m,n,U(1,j),V(1,j),dparm,iparm)
-         call second(t3)
+         call cpu_time(t3)
          tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
@@ -749,7 +749,7 @@ c     %---------------------------------------------%
 c     %------------------------------------%
 c     | Extended local reorthogonalization |
 c     %------------------------------------%
-            call second(t2)
+            call cpu_time(t2)
             if (j.gt.1 .and. ioption(2).gt.0 .and.
      c           alpha.lt.kappa*beta) then
                do i=1,ioption(2)
@@ -766,7 +766,7 @@ c     %------------------------------------%
  10            work(inu+j-2) = eps
                alpha = s
             endif
-            call second(t3)
+            call cpu_time(t3)
             telrv = telrv + (t3-t2)
 
             B(j,1) = alpha
@@ -808,10 +808,10 @@ c     %------------------------------%
             else if (.not. force_reorth) then
                call dcompute_int(work(inu),j-1,delta,eta,iwork(iidx))
             endif
-            call second(t2)
+            call cpu_time(t2)
             call dreorth(n,j-1,V,ldv,V(1,j),alpha,iwork(iidx),
      c           kappa,work(is),ioption(1))
-            call second(t3)
+            call cpu_time(t3)
             treorthv = treorthv+(t3-t2)
 
             call dset_mu(j-1,work(inu),iwork(iidx),eps)
@@ -874,9 +874,9 @@ c     %-------------------------------------------------%
 c     %------------------------------------------------%
 c     | beta_{j+1} u_{j+1} = A*v_{j} - alpha_{j} u_{j} |
 c     %------------------------------------------------%
-         call second(t2)
+         call cpu_time(t2)
          call aprod('n',m,n,V(1,j),U(1,j+1),dparm,iparm)
-         call second(t3)
+         call cpu_time(t3)
          tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
@@ -886,7 +886,7 @@ c     %------------------------------------------------%
 c     %------------------------------------%
 c     | Extended local reorthogonalization |
 c     %------------------------------------%
-         call second(t2)
+         call cpu_time(t2)
          if (ioption(2).gt.0 .and. beta.lt.kappa*alpha) then
             do i=1,ioption(2)
                s = ddot(m,U(1,j),1,U(1,j+1),1)
@@ -902,7 +902,7 @@ c     %------------------------------------%
  20         work(imu+j-1) = eps
             beta = s
          endif
-         call second(t3)
+         call cpu_time(t3)
          telru = telru + (t3-t2)
 
          B(j,2) = beta
@@ -948,10 +948,10 @@ c     %--------------------------------------%
                enddo
             endif
 
- 25         call second(t2)
+ 25         call cpu_time(t2)
             call dreorth(m,j,U,ldu,U(1,j+1),beta,iwork(iidx),
      c              kappa, work(is),ioption(1))
-            call second(t3)
+            call cpu_time(t3)
             treorthu = treorthu+(t3-t2)
 
             call dset_mu(j,work(imu),iwork(iidx),eps)
@@ -1009,10 +1009,10 @@ c     %------------------------------------------------%
             call dsafescal(m,beta,U(1,j+1))
          endif
          rnorm = beta
-         call second(t2)
+         call cpu_time(t2)
       enddo
  9999 doption(3) = anorm
-      call second(t2)
+      call cpu_time(t2)
       tlanbpro = tlanbpro + (t2-t1)
       return
       end
@@ -1063,7 +1063,7 @@ c     %-----------------%
       integer i,k,s,ip
       real t1,t2
 
-      call second(t1)
+      call cpu_time(t1)
       if (delta.lt.eta) then
 c         write (*,*) 'Warning delta<eta in dcompute_int'
          return
@@ -1092,7 +1092,7 @@ c     find smallest i<k such that for all j=i,..,k, m(j) >= eta
       enddo
  40   ip = ip+1
       index(ip) = j+1
-      call second(t2)
+      call cpu_time(t2)
       tintv = tintv + (t2-t1)
       end
 c
@@ -1127,7 +1127,7 @@ c     %--------------------%
       double precision dlamch,dlapy2
       external dlamch,dlapy2
 
-      call second(t1)
+      call cpu_time(t1)
       if (j.eq.1) then
          d = eps1*(dlapy2(alpha(j), beta(j)) + alpha(1)) + eps1*anorm
          mu(1) = eps1/beta(1)
@@ -1151,7 +1151,7 @@ c     %--------------------%
          mumax = max(mumax,abs(mu(j)))
       endif
       mu(j+1) = one
-      call second(t2)
+      call cpu_time(t2)
       tupdmu = tupdmu + (t2-t1)
       end
 c
@@ -1187,7 +1187,7 @@ c     %--------------------%
       double precision dlamch,dlapy2
       external dlamch,dlapy2
 
-      call second(t1)
+      call cpu_time(t1)
       if (j.gt.1) then
          numax = zero
          do k=1,j-1
@@ -1199,7 +1199,7 @@ c     %--------------------%
          enddo
          nu(j) = one
       endif
-      call second(t2)
+      call cpu_time(t2)
       tupdnu = tupdnu + (t2-t1)
       end
 
@@ -1534,7 +1534,7 @@ c     %--------------------%
 
 c-------------------- Here begins executable code ---------------------
 
-      call second(t1)
+      call cpu_time(t1)
       iseed(1) = 1
       iseed(2) = 3
       iseed(3) = 5
@@ -1559,9 +1559,9 @@ c     %-------------------------%
       do itry=1,ntry
          call dlarnv(idist, iseed, rsize, work)
          nrm = dnrm2(rsize,work,1)
-         call second(t2)
+         call cpu_time(t2)
          call aprod(transa,m,n,work,u0,dparm,iparm)
-         call second(t3)
+         call cpu_time(t3)
          tmvopx = tmvopx + (t3-t2)
          nopx = nopx+1
 
@@ -1579,7 +1579,7 @@ c     %-------------------------%
          if (u0norm.gt.0) goto 9999
       enddo
       ierr = -1
- 9999 call second(t2)
+ 9999 call cpu_time(t2)
       tgetu0 = tgetu0 + (t2-t1)
       return
       end
@@ -1797,7 +1797,7 @@ c     %--------------------%
 
       if (k.le.0 .or. n.le.0) return
 
-      call second(t2)
+      call cpu_time(t2)
 
       do itry=1,NTRY
          normvnew_0 = normvnew
@@ -1813,7 +1813,7 @@ c     %--------------------%
       normvnew = zero
 c     vnew is numerically in span(V) => return vnew = (0,0,...,0)^T
       call dzero(n,vnew,1)
- 9999 call second(t3)
+ 9999 call cpu_time(t3)
       treorth = treorth + (t3-t2)
       nreorth = nreorth + 1
       return
@@ -1998,7 +1998,7 @@ c     |    R = P*S*Q^T. The SVD of B is then (M*P)*S*Q^T.
 c     %----------------------------------------------------------------------%
 
 
-      call second(t0)
+      call cpu_time(t0)
 
 c     %-----------------------------------------%
 c     | Set pointers into workspace array
@@ -2084,7 +2084,7 @@ c$OMP PARALLEL private(tid,nt,cnk,st,wcnk,wst)
 c$OMP END PARALLEL
       endif
 
-      call  second(t1)
+      call  cpu_time(t1)
       tritzvec = t1-t0
       end
 
