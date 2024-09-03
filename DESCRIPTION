@@ -10,3 +10,13 @@ Description: R bindings to SVD and eigensolvers (PROPACK, nuTRLan).
 License: BSD_3_clause + file LICENSE
 Copyright: see file COPYRIGHTS
 URL: https://github.com/asl/svd
+Authors@R: c(person(given = "Anton",
+                    family = "Korobeynikov",
+                    role = c("aut", "cre"),
+                    email = "anton@korobeynikov.info"),
+             person(given = c("Rasmus", "Munk"),
+                    family = "Larsen",
+                    role = c("ctb", "cph")),
+             person(given = c("Lawrence", "Berkeley", "National"),
+                    family = "Laboratory",
+                    role = c("ctb", "cph")))
