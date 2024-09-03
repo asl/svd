@@ -25,6 +25,7 @@
 #include <Rdefines.h>
 #include <R_ext/Utils.h>
 #include <R_ext/BLAS.h>
+#include <float.h>
 
 #ifndef FCONE
 # define FCONE
@@ -198,12 +199,12 @@ SEXP propack_svd(SEXP A, SEXP ne, SEXP opts) {
   lwrk = m+n+14*kmax+8*kmax*kmax+32*m+9;
 
   /* Allocate work buffers */
-  work = (double*)Calloc(lwrk, double);
-  iwork = (int*)Calloc(liwrk, int);
+  work = (double*)R_Calloc(lwrk, double);
+  iwork = (int*)R_Calloc(liwrk, int);
   wU = (double*)R_alloc(m, (kmax+2)*sizeof(double));
   wV = (double*)R_alloc(n, (kmax+1)*sizeof(double));
   sigma = (double*)R_alloc(kmax, sizeof(double));
-  bnd = (double*)Calloc(kmax, double);
+  bnd = (double*)R_Calloc(kmax, double);
 
   /* Set first column of U to zero. This will make dlansvd_irl generate a random
      starting vector */
@@ -225,7 +226,7 @@ SEXP propack_svd(SEXP A, SEXP ne, SEXP opts) {
                                 dparm, iparm);
 
   /* Cleanup */
-  Free(work); Free(iwork); Free(bnd);
+  R_Free(work); R_Free(iwork); R_Free(bnd);
 
   /* Print some additional information */
   if (verbose)

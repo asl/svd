@@ -269,7 +269,7 @@ trlanczos(trl_matprod op,
   i2 += info->maxlan;
   betrot = &wrk[i1 - 1];
   /* allocate an integer workspace. iwrk holds... */
-  iwrk = Calloc(4 * info->maxlan, int);
+  iwrk = R_Calloc(4 * info->maxlan, int);
   memset(iwrk, 0, (4 * info->maxlan) * sizeof(int));
   /* chkpnt specifies how often the check point should be written. */
   if (info->cpflag <= 0) {
@@ -316,7 +316,7 @@ trlanczos(trl_matprod op,
                       alpha, alfrot, beta, betrot, evec, base, qa,
                       qb, rr, title, iwrk);
     }
-    Free(iwrk);
+    R_Free(iwrk);
     return;
   }
   /* we will perform the first convergence test after next_testmatrix-vector
@@ -927,7 +927,7 @@ end:
                     alfrot, beta, betrot, evec, base, qa, qb, rr,
                     title, iwrk);
   }
-  Free(iwrk);
+  R_Free(iwrk);
   return;
 }
 

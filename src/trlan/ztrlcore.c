@@ -583,23 +583,23 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 //   alfrot: wrk(2*maxlan+1:3*maxlan), betrot: wrk(3*maxlan+1:4*maxlan)
 //
     nbas = nrow * imax2(1, info->maxlan - mev + 1);
-    base = Calloc(nbas, trl_dcomplex);
-    alpha = Calloc(info->maxlan, double);
-    beta = Calloc(info->maxlan, double);
-    alfrot = Calloc(info->maxlan, double);
-    betrot = Calloc(info->maxlan, double);
-    lambda = Calloc(info->maxlan, double);
-    res = Calloc(info->maxlan, double);
-    yy = Calloc((info->maxlan) * (info->maxlan),
+    base = R_Calloc(nbas, trl_dcomplex);
+    alpha = R_Calloc(info->maxlan, double);
+    beta = R_Calloc(info->maxlan, double);
+    alfrot = R_Calloc(info->maxlan, double);
+    betrot = R_Calloc(info->maxlan, double);
+    lambda = R_Calloc(info->maxlan, double);
+    res = R_Calloc(info->maxlan, double);
+    yy = R_Calloc((info->maxlan) * (info->maxlan),
                 double);
-    yy2 = Calloc((info->maxlan) * (info->maxlan),
+    yy2 = R_Calloc((info->maxlan) * (info->maxlan),
                  trl_dcomplex);
-    rot = Calloc((info->maxlan) * (info->maxlan),
+    rot = R_Calloc((info->maxlan) * (info->maxlan),
                  double);
     i2 = 0;
 //
 // allocate an integer workspace. iwrk holds...
-    iwrk = Calloc((4 * info->maxlan), int);
+    iwrk = R_Calloc((4 * info->maxlan), int);
 //
 // chkpnt specifies how often the check point should be written.
     if (info->cpflag <= 0) {
@@ -1271,17 +1271,17 @@ ztrlanczos(ztrl_matprod op, trl_info * info, int nrow, int mev, double *eval,
 			  title, iwrk);
     }
 
-    Free(iwrk);
-    Free(rot);
-    Free(yy2);
-    Free(yy);
-    Free(res);
-    Free(lambda);
-    Free(betrot);
-    Free(alfrot);
-    Free(beta);
-    Free(alpha);
-    Free(base);
+    R_Free(iwrk);
+    R_Free(rot);
+    R_Free(yy2);
+    R_Free(yy);
+    R_Free(res);
+    R_Free(lambda);
+    R_Free(betrot);
+    R_Free(alfrot);
+    R_Free(beta);
+    R_Free(alpha);
+    R_Free(base);
 
     return;
 //

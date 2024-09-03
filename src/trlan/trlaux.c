@@ -305,7 +305,7 @@ trl_check_recurrence(trl_matprod op,
   if (lwrk >= jnd * 4 + nrow)
     aq = &wrk[lwrk - nrow];
   else if (lwrk >= jnd * 4)
-    aq = Calloc(nrow, double);
+    aq = R_Calloc(nrow, double);
 
   memset(wrk, 0, 4 * jnd * sizeof(double));
   cs = &wrk[jnd];
@@ -495,7 +495,7 @@ trl_check_recurrence(trl_matprod op,
     trl_print_real(info, title, jnd, cs, 1);
   }
   if (lwrk < jnd * 4 + nrow)
-    Free(aq);
+    R_Free(aq);
 }
 
 int trl_write_checkpoint(char *filename, int nrow, double *alpha,
@@ -653,15 +653,15 @@ void trl_pe_filename(size_t nlen, char *filename, char *base, int my_rank,
     error("error: not enough space for filename (%u+%u chars).\n",
           (unsigned)len, ndig);
 
-  tfilename = Calloc(nlen, char);
+  tfilename = R_Calloc(nlen, char);
   strncpy(tfilename, base, len);
   off = 1 + ndig % 10;
   off = 15 + 2 * off;
-  format = Calloc(off, char);
+  format = R_Calloc(off, char);
   snprintf(format, off, "%%s%%0%d.%dd", ndig, ndig);
   snprintf(filename, nlen, format, tfilename, my_rank);
-  Free(format);
-  Free(tfilename);
+  R_Free(format);
+  R_Free(tfilename);
   return;
 }
 

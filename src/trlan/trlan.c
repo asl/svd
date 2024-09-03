@@ -6,6 +6,7 @@
 #include <R.h>
 #include <Rmath.h>
 #include <R_ext/Lapack.h>
+#include <float.h>
 
 #ifndef FCONE
 # define FCONE
@@ -253,7 +254,7 @@ trl_ritz_projection(trl_matprod op,
   } else if (mev > nev) {
     avec = &evec[(mev - 1) * nrow];
   } else {
-    avec = Calloc(nrow, double);
+    avec = R_Calloc(nrow, double);
   }
   if (info->verbose >= 0) {
     if (info->log_fp == NULL) {
@@ -281,15 +282,15 @@ trl_ritz_projection(trl_matprod op,
     rvv = wrk;
     wrk2 = &wrk[nsqr];
     lwrk2 = lwrk - nsqr;
-    uau = Calloc(nsqr, double);
+    uau = R_Calloc(nsqr, double);
   } else if (lwrk >= iuau) {
     uau = wrk;
-    rvv = Calloc(nsqr + nsqr, double);
+    rvv = R_Calloc(nsqr + nsqr, double);
     wrk2 = &rvv[nsqr];
     lwrk2 = nsqr;
   } else {
-    uau = Calloc(nsqr, double);
-    rvv = Calloc(nsqr + nsqr, double);
+    uau = R_Calloc(nsqr, double);
+    rvv = R_Calloc(nsqr + nsqr, double);
     wrk2 = &rvv[nsqr];
     lwrk2 = nsqr;
   }
@@ -396,12 +397,12 @@ trl_ritz_projection(trl_matprod op,
   }
 end:
   if (lwrk < iuau) {
-    Free(uau);
-    Free(rvv);
+    R_Free(uau);
+    R_Free(rvv);
   } else if (lwrk < irvv) {
-    Free(rvv);
+    R_Free(rvv);
   } else if (lwrk < iuau + irvv) {
-    Free(uau);
+    R_Free(uau);
   }
 }
 
@@ -456,31 +457,31 @@ void trlan(trl_matprod op,
       /* associate the larger one of base and misc to WRK */
       if (ii >= nmis) {
         base = wrk;
-        misc = Calloc(nmis, double);
+        misc = R_Calloc(nmis, double);
         imis = 0;
       } else {
         misc = wrk;
         nmis = lwrk0;
-        base = Calloc(ii, double);
+        base = R_Calloc(ii, double);
         ibas = 0;
       }
     } else if (ii <= nmis) {
       /* base is smaller, associate base with WRK */
       base = wrk;
-      misc = Calloc(nmis, double);
+      misc = R_Calloc(nmis, double);
       imis = 0;
     } else {
       /* misc is smaller, associate misc with WRK */
       misc = wrk;
       nmis = lwrk0;
-      base = Calloc(ii, double);
+      base = R_Calloc(ii, double);
       ibas = 0;
     }
   } else {
     /* have to allocate both base and misc */
-    base = Calloc(ii, double);
+    base = R_Calloc(ii, double);
     ibas = 0;
-    misc = Calloc(nmis, double);
+    misc = R_Calloc(nmis, double);
     imis = 0;
   }
   memset(base, 0, ii * sizeof(double));
@@ -515,9 +516,9 @@ void trlan(trl_matprod op,
   /* DONE, reclaim the space allocated */
 end:
   if (imis == 0)
-    Free(misc);
+    R_Free(misc);
   if (ibas == 0)
-    Free(base);
+    R_Free(base);
   clk1 = clock();
   info->tick_t  += (clk1 - info->clk_tot) / (double) (info->clk_rate);
   info->clk_tot  = 0;
@@ -954,27 +955,27 @@ trl_check_ritz(trl_matprod op,
   } else if (lwrk >= (nrow + ncol)) {
     aq = &wrk[0];
     gsumwrk = &wrk[nrow];
-    rq = Calloc(3 * ncol, double);
+    rq = R_Calloc(3 * ncol, double);
     rqi = 1;
   } else if (lwrk >= (4 * ncol)) {
     rq = &wrk[0];
     gsumwrk = &wrk[3 * ncol];
-    aq = Calloc(nrow, double);
+    aq = R_Calloc(nrow, double);
     aqi = 1;
   } else if (lwrk >= ncol) {
     gsumwrk = wrk;
-    aq = Calloc(nrow, double);
+    aq = R_Calloc(nrow, double);
     aqi = 1;
-    rq = Calloc(3 * ncol, double);
+    rq = R_Calloc(3 * ncol, double);
     rqi = 1;
   } else {
     /* WRK not provided -- allocate space for AQ and RQ,  */
     /* gsumwrk points to the last third of RQ             */
-    aq = Calloc(nrow, double);
+    aq = R_Calloc(nrow, double);
     aqi = 1;
-    rq = Calloc(3 * ncol, double);
+    rq = R_Calloc(3 * ncol, double);
     rqi = 1;
-    gsumwrk = Calloc(ncol, double);
+    gsumwrk = R_Calloc(ncol, double);
     gsumwrki = 1;
   }
   memset(aq, 0, nrow * sizeof(double));
@@ -1080,13 +1081,13 @@ trl_check_ritz(trl_matprod op,
     *check = 1;
 
   if (rqi > 0)
-    Free(rq);
+    R_Free(rq);
 
   if (aqi > 0)
-    Free(aq);
+    R_Free(aq);
 
   if (gsumwrki > 0)
-    Free(gsumwrk);
+    R_Free(gsumwrk);
 
   trl_close_logfile(info);
 }
@@ -1106,7 +1107,7 @@ trl_rayleigh_quotients(trl_matprod op,
   if (base != NULL) {
     avec = base;
   } else {
-    avec = Calloc(nrow, double);
+    avec = R_Calloc(nrow, double);
   }
   memset(avec, 0, nrow * sizeof(double));
   if (info->verbose >= 0) {
@@ -1148,7 +1149,7 @@ trl_rayleigh_quotients(trl_matprod op,
     }
   }
   if (base == NULL)
-    Free(avec);
+    R_Free(avec);
 
   trl_close_logfile(info);
 }

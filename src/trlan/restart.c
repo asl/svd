@@ -11,6 +11,7 @@
 #include "trlan_i.h"
 
 #include <limits.h>
+#include <float.h>
 
 #define nint(a) (ceil(a)-a > 0.5  ? (int)(a) : (int)ceil(a))
 

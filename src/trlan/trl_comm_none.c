@@ -11,6 +11,7 @@
 
 #include <R.h>
 #include <Rmath.h>
+#include <float.h>
 
 #include "trlan.h"
 #include "trlan_i.h"

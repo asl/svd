@@ -25,6 +25,7 @@
 #include <R_ext/Utils.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Complex.h>
+#include <float.h>
 
 #ifndef FCONE
 # define FCONE
@@ -151,11 +152,11 @@ SEXP ztrlan_svd(SEXP A, SEXP ne, SEXP opts,
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
   ldwrk = kmax*(kmax+10);
-  dwrk  = Calloc(ldwrk, double);
+  dwrk  = R_Calloc(ldwrk, double);
   lwrk = m*(kmax+10);
-  wrk  = Calloc(lwrk, Rcomplex);
-  eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, Rcomplex);
+  wrk  = R_Calloc(lwrk, Rcomplex);
+  eval = R_Calloc(kmax, double);
+  evec = R_Calloc(kmax*m, Rcomplex);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -196,8 +197,8 @@ SEXP ztrlan_svd(SEXP A, SEXP ne, SEXP opts,
   ztrlan(opfn, &info, m, kmax, eval, evec, m, wrk, lwrk, dwrk, ldwrk, &param);
 
   /* Cleanup */
-  Free(wrk);
-  Free(dwrk);
+  R_Free(wrk);
+  R_Free(dwrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -227,7 +228,7 @@ SEXP ztrlan_svd(SEXP A, SEXP ne, SEXP opts,
   SET_TAG(CDR(res), install("u"));
 
   /* Cleanup */
-  Free(eval); Free(evec);
+  R_Free(eval); R_Free(evec);
 
   UNPROTECT(3);
   return res;
@@ -278,11 +279,11 @@ SEXP ztrlan_eigen(SEXP A, SEXP ne, SEXP opts,
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
   ldwrk = kmax*(kmax+10);
-  dwrk  = Calloc(ldwrk, double);
+  dwrk  = R_Calloc(ldwrk, double);
   lwrk = m*(kmax+10);
-  wrk  = Calloc(lwrk, Rcomplex);
-  eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, Rcomplex);
+  wrk  = R_Calloc(lwrk, Rcomplex);
+  eval = R_Calloc(kmax, double);
+  evec = R_Calloc(kmax*m, Rcomplex);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -324,8 +325,8 @@ SEXP ztrlan_eigen(SEXP A, SEXP ne, SEXP opts,
   /* trl_print_info(&info); */
 
   /* Cleanup */
-  Free(wrk);
-  Free(dwrk);
+  R_Free(wrk);
+  R_Free(dwrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -351,7 +352,7 @@ SEXP ztrlan_eigen(SEXP A, SEXP ne, SEXP opts,
   SET_TAG(CDR(res), install("u"));
 
   /* Cleanup */
-  Free(eval); Free(evec);
+  R_Free(eval); R_Free(evec);
 
   UNPROTECT(3);
   return res;

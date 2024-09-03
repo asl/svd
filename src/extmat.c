@@ -111,8 +111,8 @@ static void rextmat_finalizer(SEXP ptr) {
 
   re = (rext_matrix*)e->matrix;
 
-  Free(re);
-  Free(e);
+  R_Free(re);
+  R_Free(e);
   R_ClearExternalPtr(ptr);
 }
 
@@ -122,13 +122,13 @@ SEXP initialize_rextmat(SEXP f, SEXP tf, SEXP n, SEXP m, SEXP rho) {
   SEXP emat, lf, ltf;
 
   /* Allocate memory */
-  re = Calloc(1, rext_matrix);
+  re = R_Calloc(1, rext_matrix);
 
   re->n = asInteger(n);
   re->m = asInteger(m);
 
   /* Create external matrix envelope */
-  e = Calloc(1, ext_matrix);
+  e = R_Calloc(1, ext_matrix);
   e->type = "external matrix from R";
   e->mulfn = rextmat_matmul;
   e->tmulfn = rextmat_tmatmul;

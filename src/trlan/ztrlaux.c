@@ -528,7 +528,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
     if (lwrk >= jnd * 4 + nrow) {
 	aq = &wrk[lwrk - nrow];
     } else if (lwrk >= jnd * 4) {
-      aq = Calloc(nrow, trl_dcomplex);
+      aq = R_Calloc(nrow, trl_dcomplex);
 	if (aq == NULL) {
 	    fprintf(info->log_fp,
 		    "TRL_CHECK_RECURRENCE: failed to allcoate workspace.\n");
@@ -809,7 +809,7 @@ ztrl_check_recurrence(ztrl_matprod op, trl_info * info,
     trl_print_complex_(info, title, jnd, cs, 1);
     //}
     if (lwrk < jnd * 4 + nrow)
-	Free(aq);
+	R_Free(aq);
 //
 // .. end of trl_check_recurrence ..
 //

@@ -24,6 +24,7 @@
 #include <Rdefines.h>
 #include <R_ext/Utils.h>
 #include <R_ext/BLAS.h>
+#include <float.h>
 
 #ifndef FCONE
 # define FCONE
@@ -207,9 +208,9 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
   lwrk = kmax*(kmax+10);
-  wrk  = Calloc(lwrk, double);
-  eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, double);
+  wrk  = R_Calloc(lwrk, double);
+  eval = R_Calloc(kmax, double);
+  evec = R_Calloc(kmax*m, double);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -250,7 +251,7 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
   trlan(opfn, &info, m, kmax, eval, evec, m, lwrk, wrk, &param);
 
   /* Cleanup */
-  Free(wrk);
+  R_Free(wrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -280,7 +281,7 @@ SEXP trlan_svd(SEXP A, SEXP ne, SEXP opts,
   SET_TAG(CDR(res), install("u"));
 
   /* Cleanup */
-  Free(eval); Free(evec);
+  R_Free(eval); R_Free(evec);
 
   UNPROTECT(3);
   return res;
@@ -336,9 +337,9 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
   getScalarListElement(verbose, opts, "verbose", asInteger, 0);
 
   lwrk = kmax*(kmax+10);
-  wrk  = Calloc(lwrk, double);
-  eval = Calloc(kmax, double);
-  evec = Calloc(kmax*m, double);
+  wrk  = R_Calloc(lwrk, double);
+  eval = R_Calloc(kmax, double);
+  evec = R_Calloc(kmax*m, double);
 
   trl_init_info(&info, m, kmax, +1, neig, tol, 7, maxiter, -1);
   info.verbose = verbose;
@@ -380,7 +381,7 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
   /* trl_print_info(&info); */
 
   /* Cleanup */
-  Free(wrk);
+  R_Free(wrk);
 
   if (info.stat == 0) {
     if (info.nec < neig) {
@@ -406,7 +407,7 @@ SEXP trlan_eigen(SEXP A, SEXP ne, SEXP opts,
   SET_TAG(CDR(res), install("u"));
 
   /* Cleanup */
-  Free(eval); Free(evec);
+  R_Free(eval); R_Free(evec);
 
   UNPROTECT(3);
   return res;

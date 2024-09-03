@@ -297,14 +297,14 @@ ztrl_check_ritz(ztrl_matprod op, trl_info * info, int nrow, int ncol,
     gsumwrk = &wrk[nrow];
   } else if (lwrk >= ncol) {
     gsumwrk = &wrk[0];
-    aq = Calloc(nrow, trl_dcomplex);
+    aq = R_Calloc(nrow, trl_dcomplex);
     if (aq == NULL) {
       error("TRL_CHECK_RITZ: Failed to allocated workspace AQ");
     }
     aqi = 1;
   } else if (lwrk >= ncol) {
     gsumwrk = wrk;
-    aq = Calloc(nrow, trl_dcomplex);
+    aq = R_Calloc(nrow, trl_dcomplex);
     if (aq == NULL) {
       error("TRL_CHECK_RITZ: Failed to allocated workspace AQ");
     }
@@ -312,27 +312,27 @@ ztrl_check_ritz(ztrl_matprod op, trl_info * info, int nrow, int ncol,
   } else {
     // WRK not provided -- allocate space for AQ and RQ,
     // gsumwrk points to the last third of RQ
-    aq = Calloc(nrow, trl_dcomplex);
+    aq = R_Calloc(nrow, trl_dcomplex);
     if (aq == NULL) {
       error("TRL_CHECK_RITZ: Failed to allocated workspace AQ");
     }
     aqi = 1;
-    gsumwrk = Calloc(ncol, trl_dcomplex);
+    gsumwrk = R_Calloc(ncol, trl_dcomplex);
     if (gsumwrk == NULL) {
       error("TRL_CHECK_RITZ: Failed to allocate workspace GSUMWRK.\n");
     }
     gsumwrki = 1;
   }
-  dsumwrk = Calloc(ncol, double);
+  dsumwrk = R_Calloc(ncol, double);
   memset(aq, 0, nrow * sizeof(trl_dcomplex));
   memset(gsumwrk, 0, ncol * sizeof(trl_dcomplex));
   memset(dsumwrk, 0, ncol * sizeof(double));
   //
   // go through each Ritz pair one at a time, compute Rayleigh
   // quotient and the corresponding residual norm
-  rq = Calloc(3 * ncol, double);
-  res = Calloc(ncol, double);
-  err = Calloc((2 * ncol), double);
+  rq = R_Calloc(3 * ncol, double);
+  res = R_Calloc(ncol, double);
+  err = R_Calloc((2 * ncol), double);
   for (i = 0; i < ncol; i++) {
     op(&nrow, &i__1, &rvec[i * ldrvec], &ldrvec, aq, &nrow, lparam);
     // Rayleigh quotient -- assuming rvec(:,i) has unit norm
@@ -468,15 +468,15 @@ ztrl_check_ritz(ztrl_matprod op, trl_info * info, int nrow, int ncol,
   }
   if (info->nec < info->ned)
     *check = 1;
-  Free(res);
-  Free(err);
-  Free(rq);
-  Free(dsumwrk);
+  R_Free(res);
+  R_Free(err);
+  R_Free(rq);
+  R_Free(dsumwrk);
   if (aqi > 0) {
-    Free(aq);
+    R_Free(aq);
   }
   if (gsumwrki > 0) {
-    Free(gsumwrk);
+    R_Free(gsumwrk);
   }
   trl_close_logfile(info);
 //
