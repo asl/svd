@@ -4,14 +4,14 @@ c     with partial reorthogonalization.
 c
 c     Parameters:
 c
-c     WHICH: CHARACTER*1. Decides which singular triplets to compute.
+c     WHICH: CHARACTER(LEN=1). Decides which singular triplets to compute.
 c            If WHICH.EQ.'L' then compute triplets corresponding to the K
 c            largest singular values.
 c            If WHICH.EQ.'S' then compute triplets corresponding to the K
 c            smallest singular values.
-c     JOBU: CHARACTER*1. If JOBU.EQ.'Y' then compute the left singular vectors.
+c     JOBU: CHARACTER(LEN=1). If JOBU.EQ.'Y' then compute the left singular vectors.
 c           Otherwise the array U is not touched.
-c     JOBV: CHARACTER*1. If JOBV.EQ.'Y' then compute the right singular
+c     JOBV: CHARACTER(LEN=1). If JOBV.EQ.'Y' then compute the right singular
 c           vectors. Otherwise the array V is not touched.
 c     M:    INTEGER. Number of rows of A.
 c     N:    INTEGER. Number of columns of A.
@@ -24,7 +24,7 @@ c     APROD: Subroutine defining the linear operator A.
 c            APROD should be of the form:
 c
 c           SUBROUTINE DAPROD(TRANSA,M,N,X,Y,DPARM,IPARM)
-c           CHARACTER*1 TRANSA
+c           CHARACTER(LEN=1) TRANSA
 c           INTEGER M,N,IPARM(*)
 c           DOUBLE PRECISION X(*),Y(*),DPARM(*)
 c
@@ -112,7 +112,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character*1 which,jobu,jobv
+      character(len=1) which,jobu,jobv
       integer m,n,p,neig,maxiter,ldu,ldv,iter,liwork
       integer iwork(liwork),lwork,info,ioption(*)
       double precision U(ldu,*),V(ldv,*),Sigma(*),bnd(*),work(lwork)
@@ -429,7 +429,7 @@ c     %-----------%
 c     | Arguments |
 c     %-----------%
       implicit none
-      character*1 which,jobu,jobv
+      character(len=1) which,jobu,jobv
       integer m,n,p,neig,maxiter,ldu,ldv,iter,liwork,dim
       integer iwork(liwork),lwork,info,ioption(*)
       double precision U(ldu,*),V(ldv,*),Sigma(*),bnd(*),work(lwork)
@@ -473,7 +473,7 @@ c     APROD: Subroutine defining the linear operator A.
 c            APROD should be of the form:
 c
 c           SUBROUTINE DAPROD(TRANSA,M,N,X,Y,DPARM,IPARM)
-c           CHARACTER*1 TRANSA
+c           CHARACTER(LEN=1) TRANSA
 c           INTEGER M,N,IPARM(*)
 c           DOUBLE PRECISION X(*),Y(*),DPARM(*)
 c
@@ -1279,7 +1279,7 @@ c     %-----------%
 c     | Arguments |
 c     %-----------%
       implicit none
-      character*1 jobu,jobv
+      character(len=1) jobu,jobv
       integer m,n,k,ldu,ldv
       double precision D(*),E(*),U(ldu,*),V(ldv,*),sigma
 
@@ -1357,7 +1357,7 @@ c If jobq=='Y' then on return Qt contains Q^T.
 c     %------------%
 c     | Parameters |
 c     %------------%
-      character*1 jobq
+      character(len=1) jobq
       logical ignorelast
       integer n,ldq
       double precision D(*),E(*),c1,c2,Qt(ldq,*)
@@ -1505,7 +1505,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character*1 transa
+      character(len=1) transa
       integer m, n, j, ntry, ldu, ierr,icgs
       integer iparm(*)
       double precision u0norm,anormest
@@ -1590,7 +1590,7 @@ c
 c     compute B <- alpha*op(A)*B + beta*B
 c
       implicit none
-      character*1 transa
+      character(len=1) transa
       integer m,n,k,lda,ldb,ldwork
       double precision alpha,beta,A(lda,*),B(ldb,*),dwork(ldwork)
       integer i,j,l,blocksize
@@ -1641,7 +1641,7 @@ c
 c     compute  A <- alpha*A*op(B)
 c
       implicit none
-      character*1 transb
+      character(len=1) transb
       integer m,n,k,lda,ldb,ldwork
       double precision alpha,A(lda,*),B(ldb,*),dwork(ldwork)
       integer i,j,l,blocksize
@@ -1920,14 +1920,14 @@ c               A*V_{dim} = U_{dim+1}*B_{dim}.
 c
 c     Parameters:
 c
-c     WHICH: CHARACTER*1. Decides which singular triplets to compute.
+c     WHICH: CHARACTER(LEN=1). Decides which singular triplets to compute.
 c            If WHICH.EQ.'L' then compute triplets corresponding to the K
 c            largest singular values.
 c            If WHICH.EQ.'S' then compute triplets corresponding to the K
 c            smallest singular values.
-c     JOBU: CHARACTER*1. If JOBU.EQ.'Y' then compute the left singular vectors.
+c     JOBU: CHARACTER(LEN=1). If JOBU.EQ.'Y' then compute the left singular vectors.
 c           Otherwise the array U is not touched.
-c     JOBV: CHARACTER*1. If JOBV.EQ.'Y' then compute the right singular
+c     JOBV: CHARACTER(LEN=1). If JOBV.EQ.'Y' then compute the right singular
 c           vectors. Otherwise the array V is not touched.
 c     M:    INTEGER. Number of rows of A.
 c     N:    INTEGER. Number of columns of A.
@@ -1967,7 +1967,7 @@ c     | Arguments |
 c     %-----------%
       implicit none
       include 'stat.h'
-      character*1 which,jobu,jobv
+      character(len=1) which,jobu,jobv
       integer m,n,k,dim,ldu,ldv,in_lwrk,iwork(*)
       double precision U(ldu,*),V(ldv,*),D(*),E(*),S(*),work(*)
 
