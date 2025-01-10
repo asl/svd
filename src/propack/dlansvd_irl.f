@@ -1236,9 +1236,10 @@ c     %--------------------%
 c     Check for quick return
       if ((k.le.0).or.(n.le.0)) return
       iblck = 1
-      p = index(iblck)
-      q = index(iblck+1)
-      do while(p.le.k .and.p .gt.0 .and. p.le.q)
+      do while(index(iblck) .le. k .and. index(iblck) .gt. 0)
+         p = index(iblck)
+         q = index(iblck+1)
+         if (p .gt. q) exit
 c     Select the next block of columns from V
          ndot = ndot + (q-p+1)
          coef = zero
@@ -1264,8 +1265,6 @@ CDIR$ LOOP COUNT(10000)
             vnew(j) = vnew(j) - coef*V(j,q)
          enddo
          iblck = iblck + 2
-         p = index(iblck)
-         q = index(iblck+1)
       enddo
       end
 
